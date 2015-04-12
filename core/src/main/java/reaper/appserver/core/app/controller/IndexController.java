@@ -29,7 +29,7 @@ public class IndexController extends BaseController
             String userId = request.getSessionUser();
 
             response.set("message", "HelloWorld");
-            
+
             PostgreDataSource dataSource = PostgreDataSource.getInstance();
             Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT facebook_id FROM users WHERE user_id = ?");
