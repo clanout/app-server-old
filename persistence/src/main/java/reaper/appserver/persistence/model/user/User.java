@@ -6,14 +6,61 @@ import java.util.Calendar;
 
 public class User implements Entity
 {
+    public static enum Status
+    {
+        ACTIVE,
+        DISABLED,
+        FLAGGED
+    }
+
+    public static enum Gender
+    {
+        MALE("M"),
+        FEMALE("F"),
+        OTHER("O"),
+        NOT_SPECIFIED("NS");
+
+        private String code;
+
+        private Gender(String code)
+        {
+            this.code = code;
+        }
+
+        public String getCode()
+        {
+            return code;
+        }
+
+        public static Gender fromCode(String code)
+        {
+            if (code.equalsIgnoreCase("F"))
+            {
+                return FEMALE;
+            }
+            else if (code.equalsIgnoreCase("M"))
+            {
+                return MALE;
+            }
+            else if (code.equalsIgnoreCase("O"))
+            {
+                return OTHER;
+            }
+            else
+            {
+                return NOT_SPECIFIED;
+            }
+        }
+    }
+
     private String id;
     private String username;
     private String firstname;
     private String lastname;
-    private String gender;
+    private Gender gender;
     private String phone;
-    private Calendar registered;
-    private UserStatus status;
+    private Calendar registrationTime;
+    private Status status;
 
     @Override
     public String getId()
@@ -56,12 +103,12 @@ public class User implements Entity
         this.lastname = lastname;
     }
 
-    public String getGender()
+    public Gender getGender()
     {
         return gender;
     }
 
-    public void setGender(String gender)
+    public void setGender(Gender gender)
     {
         this.gender = gender;
     }
@@ -76,22 +123,22 @@ public class User implements Entity
         this.phone = phone;
     }
 
-    public Calendar getRegistered()
+    public Calendar getRegistrationTime()
     {
-        return registered;
+        return registrationTime;
     }
 
-    public void setRegistered(Calendar registered)
+    public void setRegistrationTime(Calendar registrationTime)
     {
-        this.registered = registered;
+        this.registrationTime = registrationTime;
     }
 
-    public UserStatus getStatus()
+    public Status getStatus()
     {
         return status;
     }
 
-    public void setStatus(UserStatus status)
+    public void setStatus(Status status)
     {
         this.status = status;
     }

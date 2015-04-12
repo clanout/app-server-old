@@ -1,1 +1,1 @@
-DELETE FROM users WHERE user_id = ?
+DELETE FROM user_info WHERE user_id = ?

@@ -1,26 +1,25 @@
 package reaper.appserver.persistence.model.user.postgre;
 
-import org.apache.log4j.Logger;
-import reaper.appserver.log.LogUtil;
-import reaper.appserver.persistence.core.postgre.PostgreDataSource;
+import reaper.appserver.persistence.core.postgre.AbstractPostgreRepository;
 import reaper.appserver.persistence.core.postgre.PostgreQuery;
 import reaper.appserver.persistence.model.user.User;
 import reaper.appserver.persistence.model.user.UserRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.UUID;
 
-public class PostgreUserRepository implements UserRepository
+public class PostgreUserRepository extends AbstractPostgreRepository<User> implements UserRepository
 {
-    private static Logger log = LogUtil.getLogger(PostgreUserRepository.class);
-
     private static final String SQL_CREATE = PostgreQuery.load("user/create.sql");
     private static final String SQL_READ = PostgreQuery.load("user/read.sql");
     private static final String SQL_READ_USERNAME = PostgreQuery.load("user/read_username.sql");
     private static final String SQL_UPDATE = PostgreQuery.load("user/update.sql");
     private static final String SQL_DELETE = PostgreQuery.load("user/delete.sql");
+
+    public PostgreUserRepository()
+    {
+        super(new PostgreUserMapper());
+    }
 
     @Override
     public User getFromUsername(String username)
@@ -29,21 +28,19 @@ public class PostgreUserRepository implements UserRepository
 
         try
         {
-            PostgreDataSource postgreDataSource = PostgreDataSource.getInstance();
-            Connection connection = postgreDataSource.getConnection();
+            Connection connection = getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_USERNAME);
+
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
             {
-                user = createFromResultSet(resultSet);
+                user = entityMapper.map(resultSet);
                 break;
             }
 
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
+            close(resultSet, preparedStatement, connection);
         }
         catch (SQLException e)
         {
@@ -60,21 +57,26 @@ public class PostgreUserRepository implements UserRepository
 
         try
         {
-            PostgreDataSource postgreDataSource = PostgreDataSource.getInstance();
-            Connection connection = postgreDataSource.getConnection();
+            Connection connection = getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ);
-            preparedStatement.setString(1, id);
+
+            try
+            {
+                preparedStatement.setObject(1, UUID.fromString(id));
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
             {
-                user = createFromResultSet(resultSet);
+                user = entityMapper.map(resultSet);
                 break;
             }
 
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
+            close(resultSet, preparedStatement, connection);
         }
         catch (SQLException e)
         {
@@ -87,23 +89,94 @@ public class PostgreUserRepository implements UserRepository
     @Override
     public String create(User user)
     {
-        return null;
+        String userId = null;
+
+        try
+        {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getPhone());
+            preparedStatement.setString(3, user.getFirstname());
+            preparedStatement.setString(4, user.getLastname());
+            preparedStatement.setString(5, user.getGender().getCode());
+            preparedStatement.setTimestamp(6, new Timestamp(user.getRegistrationTime().getTimeInMillis()));
+            preparedStatement.setString(7, String.valueOf(user.getStatus()));
+
+            preparedStatement.executeUpdate();
+
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            while (resultSet.next())
+            {
+                userId = resultSet.getString(1);
+                break;
+            }
+
+            close(resultSet, preparedStatement, connection);
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to create new user; [" + e.getMessage() + "]");
+        }
+
+        user.setId(userId);
+        return userId;
     }
 
     @Override
-    public void update(User entity)
+    public void update(User user)
     {
+        try
+        {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE);
 
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getPhone());
+            preparedStatement.setString(3, user.getFirstname());
+            preparedStatement.setString(4, user.getLastname());
+            preparedStatement.setString(5, user.getGender().getCode());
+            preparedStatement.setTimestamp(6, new Timestamp(user.getRegistrationTime().getTimeInMillis()));
+            preparedStatement.setString(7, String.valueOf(user.getStatus()));
+
+            try
+            {
+                preparedStatement.setObject(8, UUID.fromString(user.getId()));
+            }catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            preparedStatement.executeUpdate();
+
+            close(preparedStatement, connection);
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to update user with user_id = " + user.getId() + "; [" + e.getMessage() + "]");
+        }
     }
 
     @Override
-    public void remove(User entity)
+    public void remove(User user)
     {
+        try
+        {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
 
-    }
+            preparedStatement.setObject(1, UUID.fromString(user.getId()));
 
-    private User createFromResultSet(ResultSet resultSet)
-    {
-        return null;
+            preparedStatement.executeUpdate();
+
+            user.setId(null);
+
+            close(preparedStatement, connection);
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to delete user with user_id = " + user.getId() + "; [" + e.getMessage() + "]");
+        }
     }
 }
