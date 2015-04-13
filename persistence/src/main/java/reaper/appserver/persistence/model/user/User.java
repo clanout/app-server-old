@@ -2,7 +2,7 @@ package reaper.appserver.persistence.model.user;
 
 import reaper.appserver.persistence.core.Entity;
 
-import java.util.Calendar;
+import java.time.OffsetDateTime;
 
 public class User implements Entity
 {
@@ -59,7 +59,7 @@ public class User implements Entity
     private String lastname;
     private Gender gender;
     private String phone;
-    private Calendar registrationTime;
+    private OffsetDateTime registrationTime;
     private Status status;
 
     @Override
@@ -123,12 +123,12 @@ public class User implements Entity
         this.phone = phone;
     }
 
-    public Calendar getRegistrationTime()
+    public OffsetDateTime getRegistrationTime()
     {
         return registrationTime;
     }
 
-    public void setRegistrationTime(Calendar registrationTime)
+    public void setRegistrationTime(OffsetDateTime registrationTime)
     {
         this.registrationTime = registrationTime;
     }

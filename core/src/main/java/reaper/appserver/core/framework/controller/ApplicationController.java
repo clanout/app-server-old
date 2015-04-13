@@ -34,33 +34,14 @@ public abstract class ApplicationController implements Controller
     @Override
     public Response run() throws ResourceNotFound, BadRequest, ServerError
     {
-        try
+        if (!preProcess())
         {
-            if (!preProcess())
-            {
-                throw new ServerError();
-            }
+            throw new ServerError();
+        }
 
-            execute();
+        execute();
 
-            if (!postProcess())
-            {
-                throw new ServerError();
-            }
-        }
-        catch (ResourceNotFound e)
-        {
-            throw e;
-        }
-        catch (BadRequest e)
-        {
-            throw e;
-        }
-        catch (ServerError e)
-        {
-            throw e;
-        }
-        catch (Exception e)
+        if (!postProcess())
         {
             throw new ServerError();
         }
@@ -80,12 +61,24 @@ public abstract class ApplicationController implements Controller
             }
             catch (IllegalAccessException | InvocationTargetException e)
             {
-                throw new ServerError();
+                Throwable cause = e.getCause();
+                if (cause instanceof ResourceNotFound)
+                {
+                    throw (ResourceNotFound) cause;
+                }
+                else if (cause instanceof BadRequest)
+                {
+                    throw (BadRequest) cause;
+                }
+                else
+                {
+                    throw new ServerError(e.getMessage());
+                }
             }
         }
         else
         {
-            throw new ResourceNotFound();
+            throw new ResourceNotFound(request.getController() + "." + request.getAction());
         }
 
     }
@@ -105,7 +98,7 @@ public abstract class ApplicationController implements Controller
         }
         catch (NoSuchMethodException | SecurityException e)
         {
-            throw new ResourceNotFound();
+            throw new ResourceNotFound(request.getController() + "." + request.getAction());
         }
 
         return method;

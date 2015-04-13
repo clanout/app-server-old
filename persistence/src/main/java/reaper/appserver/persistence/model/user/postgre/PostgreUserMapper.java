@@ -6,7 +6,8 @@ import reaper.appserver.persistence.model.user.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Calendar;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 
 public class PostgreUserMapper implements PostgreEntityMapper<User>
 {
@@ -34,12 +35,12 @@ public class PostgreUserMapper implements PostgreEntityMapper<User>
         try
         {
             Timestamp timestamp = resultSet.getTimestamp("registered");
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(timestamp);
-            user.setRegistrationTime(calendar);
+            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+            user.setRegistrationTime(time);
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             throw new SQLException("Unable to process registered (timestamp)");
         }
 

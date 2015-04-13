@@ -1,5 +1,5 @@
 CREATE TABLE user_info (
-    user_id     uuid NOT NULL PRIMARY KEY,
+    user_id     bigint NOT NULL PRIMARY KEY,
     username    text NOT NULL UNIQUE ,
     phone       text UNIQUE ,
     firstname   text NOT NULL ,

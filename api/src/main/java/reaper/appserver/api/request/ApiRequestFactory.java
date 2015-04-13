@@ -32,8 +32,7 @@ public class ApiRequestFactory
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            throw new BadRequest();
+            throw new BadRequest("Unable to parse input json (" + e.getMessage() + ")\n" + json);
         }
     }
 }
