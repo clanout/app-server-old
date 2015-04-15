@@ -8,7 +8,7 @@ public interface UserRepository extends Repository<User>
 {
     public User getFromUsername(String username);
 
-    public UserDetails getUserDetails(String userId);
+    public UserDetails getUserDetails(User user);
 
     public void toggleBlock(User user, List<String> userIds);
 

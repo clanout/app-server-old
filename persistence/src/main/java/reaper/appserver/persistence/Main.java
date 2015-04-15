@@ -2,23 +2,43 @@ package reaper.appserver.persistence;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.core.postgre.PostgreDatabaseAdapter;
 import reaper.appserver.persistence.model.user.User;
 import reaper.appserver.persistence.model.user.UserRepository;
 
+import java.lang.reflect.Type;
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 
 public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        PostgreDatabaseAdapter adapter = new PostgreDatabaseAdapter();
-        adapter.init();
+        String time = "2015-04-13T01:43:38.945+05:30";
+        OffsetDateTime time1 = OffsetDateTime.parse(time);
+        System.out.println(time1);
 
-        read();
+        Instant instant = time1.toInstant();
+        System.out.println(instant);
 
-        adapter.close();
+        String josn = (new Gson()).toJson(instant);
+        System.out.println(josn);
+
+        Instant instant1 = (new Gson()).fromJson(josn, Instant.class);
+        System.out.println(instant1);
+
+        OffsetDateTime time2 = OffsetDateTime.ofInstant(instant, ZoneId.of("Z"));
+        System.out.println(time2);
+
+//        PostgreDatabaseAdapter adapter = new PostgreDatabaseAdapter();
+//        adapter.init();
+//
+//        read();
+//
+//        adapter.close();
 
 //        OffsetDateTime offsetDateTime = OffsetDateTime.now();
 //        System.out.println(offsetDateTime);

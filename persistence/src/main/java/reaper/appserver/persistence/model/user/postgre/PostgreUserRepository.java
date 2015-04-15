@@ -54,7 +54,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
     }
 
     @Override
-    public UserDetails getUserDetails(String userId)
+    public UserDetails getUserDetails(User user)
     {
         // TODO
         return null;

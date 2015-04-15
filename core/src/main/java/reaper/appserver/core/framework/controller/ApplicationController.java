@@ -27,24 +27,18 @@ public abstract class ApplicationController implements Controller
         this.response = responseFactory.create();
     }
 
-    protected abstract boolean preProcess();
+    protected abstract void preProcess();
 
-    protected abstract boolean postProcess();
+    protected abstract void postProcess();
 
     @Override
     public Response run() throws ResourceNotFound, BadRequest, ServerError
     {
-        if (!preProcess())
-        {
-            throw new ServerError();
-        }
+        preProcess();
 
         execute();
 
-        if (!postProcess())
-        {
-            throw new ServerError();
-        }
+        postProcess();
 
         return response;
     }

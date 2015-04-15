@@ -20,5 +20,7 @@ public class RegisterController extends BaseController
         String gender = request.getData("gender");
 
         userService.create(userId, username, firstname, lastname, gender);
+
+        response.set("user_id", userId);
     }
 }
