@@ -1,5 +1,6 @@
-package reaper.appserver.persistence.model.user.postgre;
+package reaper.appserver.persistence.model.user.neogres;
 
+import reaper.appserver.persistence.core.neogres.NeogresEntityMapper;
 import reaper.appserver.persistence.core.postgre.PostgreEntityMapper;
 import reaper.appserver.persistence.model.user.User;
 
@@ -9,7 +10,7 @@ import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
-public class PostgreUserMapper implements PostgreEntityMapper<User>
+public class NeogresUserMapper implements NeogresEntityMapper<User>
 {
     @Override
     public User map(ResultSet resultSet) throws SQLException

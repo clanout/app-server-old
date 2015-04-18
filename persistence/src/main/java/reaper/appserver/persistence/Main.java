@@ -2,102 +2,115 @@ package reaper.appserver.persistence;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import reaper.appserver.persistence.core.RepositoryFactory;
-import reaper.appserver.persistence.core.postgre.PostgreDatabaseAdapter;
+import reaper.appserver.persistence.core.neogres.NeogresDatabaseAdapter;
+import reaper.appserver.persistence.model.event.Event;
+import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
+import reaper.appserver.persistence.model.user.UserDetails;
 import reaper.appserver.persistence.model.user.UserRepository;
 
-import java.lang.reflect.Type;
-import java.time.Instant;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        String time = "2015-04-13T01:43:38.945+05:30";
-        OffsetDateTime time1 = OffsetDateTime.parse(time);
-        System.out.println(time1);
+        NeogresDatabaseAdapter databaseAdapter = new NeogresDatabaseAdapter();
+        databaseAdapter.init();
 
-        Instant instant = time1.toInstant();
-        System.out.println(instant);
+        createEvent();
 
-        String josn = (new Gson()).toJson(instant);
-        System.out.println(josn);
-
-        Instant instant1 = (new Gson()).fromJson(josn, Instant.class);
-        System.out.println(instant1);
-
-        OffsetDateTime time2 = OffsetDateTime.ofInstant(instant, ZoneId.of("Z"));
-        System.out.println(time2);
-
-//        PostgreDatabaseAdapter adapter = new PostgreDatabaseAdapter();
-//        adapter.init();
-//
-//        read();
-//
-//        adapter.close();
-
-//        OffsetDateTime offsetDateTime = OffsetDateTime.now();
-//        System.out.println(offsetDateTime);
-//        Timestamp timestamp = Timestamp.from(offsetDateTime.toInstant());
-//        System.out.println(timestamp);
-//
-//        Instant instant = Instant.ofEpochMilli(timestamp.getTime());
-//        System.out.println(timestamp.toLocalDateTime());
-//        System.out.println(OffsetDateTime);
-//        OffsetDateTime offsetDateTime1 = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
-//        System.out.println(offsetDateTime1);
-
+        databaseAdapter.close();
     }
 
-    public static void read()
+    public static void createEvent()
+    {
+        EventRepository eventRepository = RepositoryFactory.create(Event.class);
+
+        Event event = new Event();
+        event.setOrganizerId("1168614936");
+        event.setType(Event.Type.PUBLIC);
+        event.setTitle("Dummy Event");
+        event.setCategory("General");
+        event.setStartTime(OffsetDateTime.now());
+        event.setEndTime(OffsetDateTime.now().plusHours(1));
+        event.setFinalized(false);
+
+        Event.Location location = new Event.Location();
+        location.setZone("Bangalore");
+
+        event.setLocation(location);
+
+        event.setChatId("12345");
+
+        String eventid = eventRepository.create(event, "Dummy Description");
+        System.out.println(eventid);
+    }
+
+    public static void load() throws Exception
+    {
+        UserRepository userRepository = RepositoryFactory.create(User.class);
+
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("D:/dump.sql"));
+        String line = "";
+        while ((line = bufferedReader.readLine()) != null)
+        {
+            String tokens[] = line.split(",");
+
+            User user = new User();
+            user.setId(tokens[0]);
+            user.setUsername(tokens[1]);
+            user.setPhone(tokens[2]);
+            user.setFirstname(tokens[3]);
+            user.setLastname(tokens[4]);
+            if (tokens[5].equalsIgnoreCase("f"))
+            {
+                user.setGender(User.Gender.FEMALE);
+            }
+            else
+            {
+                user.setGender(User.Gender.MALE);
+            }
+            user.setRegistrationTime(OffsetDateTime.parse(tokens[6].replace(" ", "T")));
+            user.setStatus(User.Status.ACTIVE);
+
+            String userId = userRepository.create(user);
+
+            System.out.println(userId + "\t" + user);
+        }
+        bufferedReader.close();
+    }
+
+    public static void readDetails()
     {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         UserRepository userRepository = RepositoryFactory.create(User.class);
 
-        User user = userRepository.getFromUsername("aytida77@gmail.com");
-        System.out.println(gson.toJson(user));
+        User user = userRepository.get("1168614936");
+        System.out.println(user);
+
+        UserDetails userDetails = userRepository.getUserDetails(user);
+        System.out.println(gson.toJson(userDetails));
     }
 
-    public static void delete()
+    public static void addFriends() throws Exception
     {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        List<String> friends = Arrays.asList("1103675594");//,"1152889224"); //, "1716296053", "1952678247", "1952678247", "2110151006", "2110151006", "2205520504", "2357802924", "2357802924", "2545240997", "2905034189", "2979990076", "3088199575", "3094026607", "3568077948", "3681025577", "4160411515", "4832104744", "5562759834", "5750394386", "5851882983", "6140792440", "6240364405", "6797439046", "6921146402", "7133834467", "7133834467", "7482228748", "8170448043", "8259296468");
+        Set<String> friend = new HashSet<>();
+        friend.addAll(friends);
+
+
         UserRepository userRepository = RepositoryFactory.create(User.class);
-
-        User user = userRepository.get("8fd638f7-c1f8-4a82-9b12-cfb5b8112c69");
+        User user = userRepository.get("1168614936");
         System.out.println(user);
 
-        userRepository.remove(user);
-
-        System.out.println(user);
-    }
-
-    public static void create()
-    {
-        UserRepository userRepository = RepositoryFactory.create(User.class);
-
-        User user = new User();
-        user.setId(String.valueOf(System.currentTimeMillis()));
-        user.setUsername("aytida77@gmail.com");
-        user.setPhone("+91-7760747507");
-        user.setFirstname("Aditya");
-        user.setLastname("Prasad");
-        user.setGender(User.Gender.MALE);
-        user.setStatus(User.Status.ACTIVE);
-
-        OffsetDateTime time = OffsetDateTime.now();
-        user.setRegistrationTime(time);
-
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(Date.from(Instant.now()));
-//        user.setRegistrationTime(calendar);
-
-        String userId = userRepository.create(user);
-
-        System.out.println(userId);
-        System.out.println(user);
+        userRepository.toggleBlock(user, friends);
     }
 }

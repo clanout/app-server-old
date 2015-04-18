@@ -24,11 +24,11 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
     public PostgreEventRepository()
     {
-        super(new EventEntityMapper());
+        super(new PostgreEventMapper());
     }
 
     @Override
-    public String create(Event event, User user, String description)
+    public String create(Event event, String description)
     {
         return null;
     }

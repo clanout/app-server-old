@@ -73,6 +73,12 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
     }
 
     @Override
+    public void addFriends(User user, List<String> userIds)
+    {
+        // TODO
+    }
+
+    @Override
     public User get(String id)
     {
         User user = null;

@@ -13,4 +13,6 @@ public interface UserRepository extends Repository<User>
     public void toggleBlock(User user, List<String> userIds);
 
     public void toggleFavourite(User user, List<String> userIds);
+
+    public void addFriends(User user, List<String> userIds);
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface EventRepository extends Repository<Event>
 {
-    public String create(Event event, User user, String description);
+    public String create(Event event, String description);
 
     public void update(Event event, User user, String description);
 

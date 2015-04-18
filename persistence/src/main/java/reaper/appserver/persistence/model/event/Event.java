@@ -8,8 +8,32 @@ public class Event implements Entity
 {
     public static enum Type
     {
-        PUBLIC,
-        INVITE_ONLY
+        PUBLIC(0),
+        INVITE_ONLY(1);
+
+        private int code;
+
+        private Type(int code)
+        {
+            this.code = code;
+        }
+
+        public int getCode()
+        {
+            return code;
+        }
+
+        public static Type fromCode(int code)
+        {
+            if (code == 0)
+            {
+                return PUBLIC;
+            }
+            else
+            {
+                return INVITE_ONLY;
+            }
+        }
     }
 
     public static enum RSVP
@@ -21,12 +45,12 @@ public class Event implements Entity
 
     public static class Location
     {
-        private double x;
-        private double y;
+        private Double x;
+        private Double y;
         private String name;
         private String zone;
 
-        public double getX()
+        public Double getX()
         {
             return x;
         }
@@ -36,7 +60,7 @@ public class Event implements Entity
             this.x = x;
         }
 
-        public double getY()
+        public Double getY()
         {
             return y;
         }

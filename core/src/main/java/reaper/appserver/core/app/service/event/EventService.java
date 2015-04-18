@@ -121,7 +121,7 @@ public class EventService
             event.setOrganizerId(user.getId());
             event.setLocation(location);
 
-            String eventId = eventRepository.create(event, user, description);
+            String eventId = eventRepository.create(event, description);
             if (eventId == null)
             {
                 throw new ServerError("Unable to create event; user_id = " + user.getId());

@@ -10,6 +10,46 @@ public class UserDetails
         private String name;
         private boolean isFavourite;
         private boolean isBlocked;
+
+        public String getId()
+        {
+            return id;
+        }
+
+        public void setId(String id)
+        {
+            this.id = id;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+
+        public boolean isFavourite()
+        {
+            return isFavourite;
+        }
+
+        public void setFavourite(boolean isFavourite)
+        {
+            this.isFavourite = isFavourite;
+        }
+
+        public boolean isBlocked()
+        {
+            return isBlocked;
+        }
+
+        public void setBlocked(boolean isBlocked)
+        {
+            this.isBlocked = isBlocked;
+        }
     }
 
     private String id;
