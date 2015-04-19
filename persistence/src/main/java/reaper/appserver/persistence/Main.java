@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.core.neogres.NeogresDatabaseAdapter;
+import reaper.appserver.persistence.core.postgre.PostgreDatabaseAdapter;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
@@ -22,12 +23,28 @@ public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        NeogresDatabaseAdapter databaseAdapter = new NeogresDatabaseAdapter();
+        PostgreDatabaseAdapter databaseAdapter = new PostgreDatabaseAdapter();
         databaseAdapter.init();
 
-        createEvent();
+        eventget();
 
         databaseAdapter.close();
+    }
+
+    public static void eventget()
+    {
+        Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
+
+        EventRepository eventRepository = RepositoryFactory.create(Event.class);
+        UserRepository userRepository = RepositoryFactory.create(User.class);
+
+        User user = userRepository.get("9320369679");
+        System.out.println(user);
+
+        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
+        System.out.println(gson.toJson(event));
+
+
     }
 
     public static void createEvent()
@@ -54,11 +71,33 @@ public class Main
         System.out.println(eventid);
     }
 
+    public static void loadFriends() throws Exception
+    {
+        UserRepository userRepository = RepositoryFactory.create(User.class);
+
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("D:/codeX/projects/reaper/test/data/friends.dat"));
+        String line = "";
+        while ((line = bufferedReader.readLine()) != null)
+        {
+            String tokens[] = line.split(";");
+
+            if (!tokens[0].equalsIgnoreCase(tokens[1]))
+            {
+                User user = userRepository.get(tokens[0]);
+
+                List<String> friends = Arrays.asList(tokens[1]);
+
+                userRepository.addFriends(user, friends);
+            }
+        }
+        bufferedReader.close();
+    }
+
     public static void load() throws Exception
     {
         UserRepository userRepository = RepositoryFactory.create(User.class);
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader("D:/dump.sql"));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("D:/codeX/projects/reaper/test/data/users.dat"));
         String line = "";
         while ((line = bufferedReader.readLine()) != null)
         {

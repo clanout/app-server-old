@@ -5,6 +5,9 @@ import reaper.appserver.persistence.model.event.Event;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 
 public class PostgreEventMapper implements PostgreEntityMapper<Event>
 {
@@ -24,7 +27,7 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         {
             Timestamp timestamp = resultSet.getTimestamp("start_timestamp");
             OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
-            user.setStartTime(time);
+            event.setStartTime(time);
         }
         catch (Exception e)
         {
@@ -35,7 +38,7 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         {
             Timestamp timestamp = resultSet.getTimestamp("end_timestamp");
             OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
-            user.setEndTime(time);
+            event.setEndTime(time);
         }
         catch (Exception e)
         {
@@ -44,17 +47,17 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         event.setOrganizerId(resultSet.getString("organizer_id"));
         event.setChatId(resultSet.getString("xmpp_group_id"));
         event.setFinalized(resultSet.getBoolean("finalized"));
-        
-        Event.Location location = new Event.Location();        
+
+        Event.Location location = new Event.Location();
         location.setX(resultSet.getDouble("longitude"));
         location.setY(resultSet.getDouble("latitude"));
         location.setName(resultSet.getString("name"));
         location.setZone(resultSet.getString("city_cell"));
         event.setLocation(location);
 
-        event.setAttendeeCount(resultSet.getInt("attendeecount"));
-        event.setFriendCount(resultSet.getInt("friendCount"));
-        event.setInviterCount(resultSet.getInt("inviterCount"));
+        event.setAttendeeCount(resultSet.getInt("attendee_count"));
+        event.setFriendCount(resultSet.getInt("friend_count"));
+        event.setInviterCount(resultSet.getInt("inviter_count"));
 
         return event;
     }

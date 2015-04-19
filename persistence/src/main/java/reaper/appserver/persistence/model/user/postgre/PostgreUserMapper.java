@@ -25,7 +25,7 @@ public class PostgreUserMapper implements PostgreEntityMapper<User>
 
         try
         {
-            user.setStatus(User.Status.valueOf(resultSet.getString("status")));
+            user.setStatus(User.Status.valueOf(resultSet.getString("status").toUpperCase()));
         }
         catch (IllegalArgumentException e)
         {

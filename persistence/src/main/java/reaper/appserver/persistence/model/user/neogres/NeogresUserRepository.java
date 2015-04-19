@@ -34,10 +34,10 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
     @Override
     public User get(String id)
     {
-        User user = null;
-
         try
         {
+            User user = null;
+
             Connection connection = getPostgresConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ);
 
@@ -57,14 +57,17 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
                 break;
             }
 
-            close(resultSet, preparedStatement, connection);
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+            return user;
         }
         catch (SQLException e)
         {
             log.error("Unable to read user with user_id = " + id + "; [" + e.getMessage() + "]");
+            return null;
         }
-
-        return user;
     }
 
     @Override
@@ -97,7 +100,9 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
             neo4jStatement.setString(2, user.getFirstname() + " " + user.getLastname());
 
             neo4jStatement.executeUpdate();
-            close(neo4jStatement, neo4jConnection);
+
+            neo4jStatement.close();
+            neo4jConnection.close();
 
             connection.commit();
 
@@ -144,7 +149,8 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
 
             preparedStatement.executeUpdate();
 
-            close(preparedStatement, connection);
+            preparedStatement.close();
+            connection.close();
         }
         catch (SQLException e)
         {
@@ -161,10 +167,10 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
     @Override
     public User getFromUsername(String username)
     {
-        User user = null;
-
         try
         {
+            User user = null;
+
             Connection connection = getPostgresConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_USERNAME);
 
@@ -177,14 +183,17 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
                 break;
             }
 
-            close(resultSet, preparedStatement, connection);
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+            return user;
         }
         catch (SQLException e)
         {
             log.error("Unable to read user with username = " + username + "; [" + e.getMessage() + "]");
+            return null;
         }
-
-        return user;
     }
 
     @Override
@@ -211,7 +220,9 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
                 friends.add(friend);
             }
 
-            close(preparedStatement, connection);
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
 
             UserDetails userDetails = new UserDetails();
             userDetails.setId(user.getId());
@@ -240,7 +251,8 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
 
             preparedStatement.executeUpdate();
 
-            close(preparedStatement, connection);
+            preparedStatement.close();
+            connection.close();
         }
         catch (SQLException e)
         {
@@ -262,7 +274,8 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
 
             preparedStatement.executeUpdate();
 
-            close(preparedStatement, connection);
+            preparedStatement.close();
+            connection.close();
 
         }
         catch (SQLException e)
@@ -284,7 +297,8 @@ public class NeogresUserRepository extends AbstractNeogresRepository<User> imple
 
             preparedStatement.executeUpdate();
 
-            close(preparedStatement, connection);
+            preparedStatement.close();
+            connection.close();
 
         }
         catch (SQLException e)

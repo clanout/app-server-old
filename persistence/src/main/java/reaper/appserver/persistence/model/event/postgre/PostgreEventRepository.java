@@ -8,7 +8,12 @@ import reaper.appserver.persistence.model.event.EventDetails;
 import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 public class PostgreEventRepository extends AbstractPostgreRepository<Event> implements EventRepository
 {
@@ -28,22 +33,41 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         super(new PostgreEventMapper());
     }
 
+    @Override
     public Event get(String id, User user)
     {
         Event event = null;
-        UUID eventId = UUID.fromString(id);
-        int userId = Integer.parseInt(user.getId());
+
         try
-        {        
+        {
+            UUID eventId = null;
+            try
+            {
+                eventId = UUID.fromString(id);
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id");
+            }
+            Long userId = null;
+            try
+            {
+                userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
             Connection connection = getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ);
-            
-            preparedStatement.setInt(1,userId);
-            preparedStatement.setInt(2,userId);
+
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, userId);
             preparedStatement.setObject(3, eventId);
             preparedStatement.setObject(4, eventId);
             preparedStatement.setObject(5, eventId);
-            preparedStatement.setInt(6,userId);
+            preparedStatement.setLong(6, userId);
             preparedStatement.setObject(7, eventId);
             preparedStatement.setObject(8, eventId);
 
@@ -58,7 +82,6 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
             log.error("Unable to read event with id = " + id + "; [" + e.getMessage() + "]");
         }
 
@@ -116,30 +139,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     @Override
     public Event get(String id)
     {
-        Event event = null;
-
-        try
-        {
-            Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ);
-
-            preparedStatement.setString(1, username);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next())
-            {
-                event = entityMapper.map(resultSet);
-                break;
-            }
-
-            close(resultSet, preparedStatement, connection);
-        }
-        catch (SQLException e)
-        {
-            log.error("Unable to read event with id = " + id + "; [" + e.getMessage() + "]");
-        }
-
-        return event;
+        throw new RepositoryActionNotAllowed();
     }
 
     @Override

@@ -6,9 +6,7 @@ import reaper.appserver.persistence.core.Entity;
 import reaper.appserver.persistence.core.Repository;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public abstract class AbstractNeogresRepository<E extends Entity> implements Repository<E>
 {
@@ -32,23 +30,5 @@ public abstract class AbstractNeogresRepository<E extends Entity> implements Rep
     {
         NeogresDataSource postgreDataSource = NeogresDataSource.getInstance();
         return postgreDataSource.getNeo4jConnection();
-    }
-
-    protected void close(Connection connection) throws SQLException
-    {
-        connection.close();
-    }
-
-    protected void close(Statement statement, Connection connection) throws SQLException
-    {
-        statement.close();
-        connection.close();
-    }
-
-    protected void close(ResultSet resultSet, Statement statement, Connection connection) throws SQLException
-    {
-        resultSet.close();
-        statement.close();
-        connection.close();
     }
 }
