@@ -108,8 +108,49 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
     @Override
     public List<Event> getVisibleEvents(User user, String zone)
-    {
-        return null;
+    {        
+        List<Event> visibleEventsList = new ArrayList<Event>();
+        Event event = null;
+
+        try
+        {            
+            Long userId = null;
+            try
+            {
+                userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ);
+
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, userId);            
+            preparedStatement.setLong(3, userId);
+            preparedStatement.setLong(4, userId);
+            preparedStatement.setLong(5, userId);
+            preparedStatement.setLong(6, userId);
+            preparedStatement.setString(7, zone);            
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                event = entityMapper.map(resultSet);
+                visibleEventsList.add(event);
+
+            }
+
+            close(resultSet, preparedStatement, connection);
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to read visible events for user with id = " + user.getId() + "; [" + e.getMessage() + "]");
+        }
+
+        return visibleEventsList;
     }
 
     @Override
