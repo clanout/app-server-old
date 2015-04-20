@@ -4,7 +4,6 @@ import com.fatboyindustrial.gsonjavatime.Converters;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import reaper.appserver.persistence.core.RepositoryFactory;
-import reaper.appserver.persistence.core.neogres.NeogresDatabaseAdapter;
 import reaper.appserver.persistence.core.postgre.PostgreDatabaseAdapter;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventRepository;

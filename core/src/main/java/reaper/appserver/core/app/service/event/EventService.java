@@ -23,14 +23,22 @@ public class EventService
         eventRepository = RepositoryFactory.create(Event.class);
     }
 
+    public Event getEvent(User user, String eventId)
+    {
+        if (eventId == null || eventId.isEmpty())
+        {
+            throw new BadRequest("event_id cannot be null/empty");
+        }
+
+        return eventRepository.get(eventId, user);
+    }
+
     public List<Event> getEvents(User user, String zone)
     {
         if (zone == null || zone.isEmpty())
         {
             throw new BadRequest("Zone not specified while fetching visible events");
         }
-
-        zone = zone.toUpperCase();
 
         return eventRepository.getVisibleEvents(user, zone);
     }
@@ -96,8 +104,8 @@ public class EventService
             {
                 try
                 {
-                    Double x = Double.parseDouble(locationLatitude);
-                    Double y = Double.parseDouble(locationLongitude);
+                    Double x = Double.parseDouble(locationLongitude);
+                    Double y = Double.parseDouble(locationLatitude);
 
                     location.setX(x);
                     location.setY(y);
@@ -270,8 +278,8 @@ public class EventService
                 location.setZone(locationZone);
                 try
                 {
-                    Double x = Double.parseDouble(locationLatitude);
-                    Double y = Double.parseDouble(locationLongitude);
+                    Double x = Double.parseDouble(locationLongitude);
+                    Double y = Double.parseDouble(locationLatitude);
 
                     location.setX(x);
                     location.setY(y);

@@ -11,7 +11,6 @@ import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
 
 import java.lang.reflect.Type;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 public class EventController extends BaseController
@@ -22,6 +21,13 @@ public class EventController extends BaseController
     {
         super(request, responseFactory);
         eventService = new EventService();
+    }
+
+    public void mainAction()
+    {
+        String eventId = request.getData("event_id");
+        Event event = eventService.getEvent(activeUser, eventId);
+        response.set("event", event);
     }
 
     public void summaryAction()
