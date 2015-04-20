@@ -1,12 +1,16 @@
 package reaper.appserver.api.request;
 
+import com.fatboyindustrial.gsonjavatime.Converters;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import reaper.appserver.core.framework.request.Request;
 
 import java.util.Map;
 
 public class ApiRequest implements Request
 {
+    private static Gson gson = Converters.registerAll(new GsonBuilder()).create();
+
     private String controller;
     private String action;
     private Map<String, String> data;
@@ -47,6 +51,6 @@ public class ApiRequest implements Request
     @Override
     public String toString()
     {
-        return (new Gson()).toJson(this);
+        return gson.toJson(this);
     }
 }

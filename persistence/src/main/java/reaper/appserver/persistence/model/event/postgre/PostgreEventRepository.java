@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -108,12 +109,10 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
     @Override
     public List<Event> getVisibleEvents(User user, String zone)
-    {        
+    {
         List<Event> visibleEventsList = new ArrayList<Event>();
-        Event event = null;
-
         try
-        {            
+        {
             Long userId = null;
             try
             {
@@ -125,20 +124,20 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             }
 
             Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ);
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_VISIBLE);
 
             preparedStatement.setLong(1, userId);
-            preparedStatement.setLong(2, userId);            
+            preparedStatement.setLong(2, userId);
             preparedStatement.setLong(3, userId);
             preparedStatement.setLong(4, userId);
             preparedStatement.setLong(5, userId);
             preparedStatement.setLong(6, userId);
-            preparedStatement.setString(7, zone);            
+            preparedStatement.setString(7, zone);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
             {
-                event = entityMapper.map(resultSet);
+                Event event = entityMapper.map(resultSet);
                 visibleEventsList.add(event);
 
             }

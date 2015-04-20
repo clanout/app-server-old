@@ -81,11 +81,8 @@ public class EventService
             OffsetDateTime endTime = null;
             try
             {
-                Gson gson = new Gson();
-                Instant startInstant = gson.fromJson(startTimeStr, Instant.class);
-                startTime = OffsetDateTime.ofInstant(startInstant, ZoneId.systemDefault());
-                Instant endInstant = gson.fromJson(endTimeStr, Instant.class);
-                endTime = OffsetDateTime.ofInstant(endInstant, ZoneId.systemDefault());
+                startTime = OffsetDateTime.parse(startTimeStr);
+                endTime = OffsetDateTime.parse(endTimeStr);
             }
             catch (Exception e)
             {
@@ -254,11 +251,8 @@ public class EventService
             {
                 try
                 {
-                    Gson gson = new Gson();
-                    Instant startInstant = gson.fromJson(startTimeStr, Instant.class);
-                    OffsetDateTime startTime = OffsetDateTime.ofInstant(startInstant, ZoneId.systemDefault());
-                    Instant endInstant = gson.fromJson(endTimeStr, Instant.class);
-                    OffsetDateTime endTime = OffsetDateTime.ofInstant(endInstant, ZoneId.systemDefault());
+                    OffsetDateTime startTime = OffsetDateTime.parse(startTimeStr);
+                    OffsetDateTime endTime = OffsetDateTime.parse(endTimeStr);
 
                     event.setStartTime(startTime);
                     event.setEndTime(endTime);

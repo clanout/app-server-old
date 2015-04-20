@@ -1,5 +1,6 @@
 package reaper.appserver.persistence;
 
+import com.fatboyindustrial.gsonjavatime.Converters;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import reaper.appserver.persistence.core.RepositoryFactory;
@@ -33,7 +34,7 @@ public class Main
 
     public static void eventget()
     {
-        Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
+        Gson gson = Converters.registerAll(new GsonBuilder()).setPrettyPrinting().create();
 
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
         UserRepository userRepository = RepositoryFactory.create(User.class);
@@ -41,8 +42,11 @@ public class Main
         User user = userRepository.get("9320369679");
         System.out.println(user);
 
-        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
-        System.out.println(gson.toJson(event));
+        //Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
+        //System.out.println(gson.toJson(event));
+
+        List<Event> events = eventRepository.getVisibleEvents(user, "Bangalore");
+        System.out.println(gson.toJson(events));
 
 
     }
