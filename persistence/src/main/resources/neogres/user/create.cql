@@ -1,1 +1,0 @@
-CREATE (:User {id: {1}, name: {2}})

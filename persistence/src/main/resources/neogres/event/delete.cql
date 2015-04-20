@@ -1,1 +1,0 @@
-MATCH (event:Event {id: {1}}) DELETE event

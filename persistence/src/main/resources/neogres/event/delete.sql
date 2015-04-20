@@ -1,1 +1,0 @@
-DELETE FROM event_info WHERE event_id = ?
