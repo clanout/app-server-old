@@ -1,39 +1,41 @@
-SELECT
-  a.event_id,
-  c.*,
-  d.*,
-  e.*
-FROM event_info a,
+SELECT invitee_list.attendee_id, invitee_list.attendee_type, invitee_list.rsvp_status,
+       CASE WHEN invitee_list.friend_id IS NOT NULL THEN true
+            ELSE false
+       END AS IsFriend
+FROM 
 (
-  SELECT
-    user_id1 AS user_id,
-    user_id2 AS friend_id
-  FROM user_relationships
-  WHERE user_id1 = ?
-  UNION
-  SELECT
-    user_id2 AS user_id,
-    user_id1 AS friend_id
-  FROM user_relationships
-  WHERE user_id2 = ?
-) friends,
-(
-  SELECT attendee_id, rsvp_status
-  FROM event_attendees
-  WHERE event_attendees.event_id = ?    
-) attendees,  
-(
-  SELECT inviter_id
-  FROM event_invitees
-  WHERE event_invitees.event_id = ?
-    AND event_invitees.invitee_id = ?
-) my_inviters,
-(
-  SELECT invitee_id
-  FROM event_invitees
-  WHERE event_invitees.event_id = ?
-    AND event_invitees.inviter_id = ?
-) my_invitees
-WHERE a.event_id = ?
-  AND b.event_id = ?
-  AND a.event_id = b.event_id
+    (
+    SELECT a.*
+    FROM 
+    (
+    (
+      SELECT invitee_id AS attendee_id, 'invitee' AS attendee_type, 'dummy' AS rsvp_status
+      FROM event_invitees
+      WHERE event_invitees.event_id = ?
+        AND event_invitees.inviter_id = ?
+    ) 
+    UNION ALL
+    (
+      SELECT inviter_id AS attendee_id, 'inviter' AS attendee_type, 'dummy' AS rsvp_status
+      FROM event_invitees
+      WHERE event_invitees.event_id = ?
+        AND event_invitees.invitee_id = ?
+    )
+    UNION ALL
+    (
+      SELECT attendee_id AS attendee_id, 'attendee' AS attendee_type, rsvp_status AS rsvp_status
+      FROM event_attendees
+      WHERE event_attendees.event_id = ?
+    )) a  ) AS attendee_list
+  LEFT OUTER JOIN
+  (
+    SELECT user_id2 AS friend_id
+    FROM user_relationships
+    WHERE user_id1 = ?
+    UNION
+    SELECT user_id1 AS friend_id
+    FROM user_relationships
+    WHERE user_id2 = ?
+  ) friends
+  ON attendee_list.attendee_id = friends.friend_id
+) invitee_list
