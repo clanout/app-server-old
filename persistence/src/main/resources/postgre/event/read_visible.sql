@@ -36,7 +36,7 @@ FROM event_info a, event_location b,
         ) friends,
         event_attendees
       WHERE event_attendees.rsvp_status = 'YES'
-            AND event_attendees.attendee_id = friends.friend_id
+            AND (event_attendees.attendee_id = friends.friend_id OR event_attendees.attendee_id = friends.user_id) 
       UNION
       SELECT DISTINCT event_invitees.event_id
       FROM event_invitees
