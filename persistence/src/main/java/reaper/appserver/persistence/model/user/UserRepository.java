@@ -8,11 +8,15 @@ public interface UserRepository extends Repository<User>
 {
     public User getFromUsername(String username);
 
-    public UserDetails getUserDetails(User user);
+    public UserDetails getUserDetails(String id);
 
-    public void toggleBlock(User user, List<String> userIds);
+    public void block(User user, List<String> userIds);
 
-    public void toggleFavourite(User user, List<String> userIds);
+    public void unblock(User user, List<String> userIds);
+
+    public void favourite(User user, List<String> userIds);
+
+    public void unfavourite(User user, List<String> userIds);
 
     public void addFriends(User user, List<String> userIds);
 }

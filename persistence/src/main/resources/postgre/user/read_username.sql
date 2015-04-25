@@ -1,1 +1,3 @@
-SELECT * FROM user_info WHERE username = ?
+SELECT *
+FROM user_info
+WHERE username = ?
