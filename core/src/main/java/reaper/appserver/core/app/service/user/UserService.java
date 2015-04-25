@@ -11,6 +11,7 @@ import reaper.appserver.persistence.model.user.UserRepository;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 
 public class UserService
 {
@@ -81,31 +82,29 @@ public class UserService
         return userRepository.get(userId);
     }
 
-    public List<UserDetails.Friend> getFriends(User user)
+    public Set<UserDetails.Friend> getFriends(User user)
     {
-        UserDetails userDetails = userRepository.getUserDetails(user);
+        UserDetails userDetails = userRepository.getUserDetails(user.getId());
         if (userDetails == null)
         {
             throw new ServerError("Unable to fetch user details for user_id = " + user.getId());
         }
 
-        List<UserDetails.Friend> friends = userDetails.getFriends();
-        if (friends == null)
-        {
-            throw new ServerError("Friend list null for user_id = " + user.getId());
-        }
+        Set<UserDetails.Friend> friends = userDetails.getFriends();
 
         return friends;
     }
 
-    public void toggleBlock(User user, List<String> userIdList)
+    public void toggleBlock(User user, List<String> blockIds, List<String> unblockIds)
     {
-        userRepository.toggleBlock(user, userIdList);
+        userRepository.unblock(user, unblockIds);
+        userRepository.block(user, blockIds);
     }
 
-    public void toggleFavourite(User user, List<String> userIdList)
+    public void toggleFavourite(User user, List<String> favouriteIds, List<String> unfavouriteIds)
     {
-        userRepository.toggleFavourite(user, userIdList);
+        userRepository.unfavourite(user, unfavouriteIds);
+        userRepository.favourite(user, favouriteIds);
     }
 
     public List<Event> getArchive(User user)
