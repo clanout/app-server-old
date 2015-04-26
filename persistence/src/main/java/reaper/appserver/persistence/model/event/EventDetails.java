@@ -1,6 +1,6 @@
 package reaper.appserver.persistence.model.event;
 
-import java.util.List;
+import java.util.Set;
 
 public class EventDetails
 {
@@ -8,8 +8,9 @@ public class EventDetails
     {
         private String id;
         private String name;
-        private boolean isFriend;
         private Event.RSVP rsvp;
+        private boolean isFriend;
+        private boolean isInviter;
 
         public String getId()
         {
@@ -29,6 +30,16 @@ public class EventDetails
         public void setName(String name)
         {
             this.name = name;
+        }
+
+        public Event.RSVP getRsvp()
+        {
+            return rsvp;
+        }
+
+        public void setRsvp(Event.RSVP rsvp)
+        {
+            this.rsvp = rsvp;
         }
 
         public boolean isFriend()
@@ -41,18 +52,50 @@ public class EventDetails
             this.isFriend = isFriend;
         }
 
-        public Event.RSVP getRsvp()
+        public boolean isInviter()
         {
-            return rsvp;
+            return isInviter;
         }
 
-        public void setRsvp(Event.RSVP rsvp)
+        public void setInviter(boolean isInviter)
         {
-            this.rsvp = rsvp;
+            this.isInviter = isInviter;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return id.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (o == this)
+            {
+                return true;
+            }
+
+            if (!(o instanceof Attendee))
+            {
+                return false;
+            }
+            else
+            {
+                Attendee other = (Attendee) o;
+                if (id.equals(other.id))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
     }
 
-    public static class InviteListUser
+    public static class Invitee
     {
         private String id;
         private String name;
@@ -76,13 +119,49 @@ public class EventDetails
         {
             this.name = name;
         }
+
+        @Override
+        public int hashCode()
+        {
+            return id.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (o == this)
+            {
+                return true;
+            }
+
+            if (!(o instanceof Invitee))
+            {
+                return false;
+            }
+            else
+            {
+                Invitee other = (Invitee) o;
+                if (id.equals(other.id))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
     }
 
     private String id;
     private String description;
-    private List<Attendee> attendees;
-    private List<InviteListUser> invited;
-    private List<InviteListUser> inviters;
+    private Set<Attendee> attendees;
+    private Set<Invitee> invitee;
+
+    public String getId()
+    {
+        return id;
+    }
 
     public void setId(String id)
     {
@@ -99,34 +178,24 @@ public class EventDetails
         this.description = description;
     }
 
-    public List<Attendee> getAttendees()
+    public Set<Attendee> getAttendees()
     {
         return attendees;
     }
 
-    public void setAttendees(List<Attendee> attendees)
+    public void setAttendees(Set<Attendee> attendees)
     {
         this.attendees = attendees;
     }
 
-    public List<InviteListUser> getInvited()
+    public Set<Invitee> getInvitee()
     {
-        return invited;
+        return invitee;
     }
 
-    public void setInvited(List<InviteListUser> invited)
+    public void setInvitee(Set<Invitee> invitee)
     {
-        this.invited = invited;
-    }
-
-    public List<InviteListUser> getInviters()
-    {
-        return inviters;
-    }
-
-    public void setInviters(List<InviteListUser> inviters)
-    {
-        this.inviters = inviters;
+        this.invitee = invitee;
     }
 
     @Override

@@ -13,15 +13,15 @@ public interface EventRepository extends Repository<Event>
 
     public void update(Event event, User user, String description);
 
-    public void remove(Event event, User user);
+    public void remove(String id, User user);
 
     public List<Event> getVisibleEvents(User user, String zone);
 
-    public void setRSVP(Event event, User user, Event.RSVP rsvp);
+    public void setRSVP(String id, User user, Event.RSVP rsvp);
 
-    public void createInvitation(Event event, User from, List<String> to);
+    public void createInvitation(String id, User from, List<String> to);
 
-    public EventDetails getDetails(Event event, User user);
+    public EventDetails getDetails(String id, User user);
 
     public List<Event> getArchive(User user);
 }

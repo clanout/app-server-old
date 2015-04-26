@@ -12,22 +12,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class PostgreEventRepository extends AbstractPostgreRepository<Event> implements EventRepository
 {
-    private static final String SQL_CREATE = PostgreQuery.load("event/create.sql");
-    private static final String SQL_CREATE_INVITATION = PostgreQuery.load("event/create_invitation.sql");
     private static final String SQL_READ = PostgreQuery.load("event/read.sql");
     private static final String SQL_READ_VISIBLE = PostgreQuery.load("event/read_visible.sql");
     private static final String SQL_READ_DETAILS = PostgreQuery.load("event/read_details.sql");
-    private static final String SQL_READ_ARCHIVE = PostgreQuery.load("event/read_archive.sql");
-    private static final String SQL_UPDATE = PostgreQuery.load("event/update.sql");
-    private static final String SQL_UPDATE_RSVP = PostgreQuery.load("event/update_rsvp.sql");
-    private static final String SQL_DELETE = PostgreQuery.load("event/delete.sql");
-
+    private static final String SQL_READ_DETAILS_DESCRIPTION = PostgreQuery.load("event/read_details_description.sql");
 
     public PostgreEventRepository()
     {
@@ -79,7 +71,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
                 break;
             }
 
-            close(resultSet, preparedStatement, connection);
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
         }
         catch (SQLException e)
         {
@@ -92,19 +86,19 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     @Override
     public String create(Event event, String description)
     {
-        return null;
+        throw new RepositoryActionNotAllowed();
     }
 
     @Override
     public void update(Event event, User user, String description)
     {
-
+        throw new RepositoryActionNotAllowed();
     }
 
     @Override
-    public void remove(Event event, User user)
+    public void remove(String id, User user)
     {
-
+        throw new RepositoryActionNotAllowed();
     }
 
     @Override
@@ -142,7 +136,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
             }
 
-            close(resultSet, preparedStatement, connection);
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
         }
         catch (SQLException e)
         {
@@ -153,21 +149,108 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     }
 
     @Override
-    public void setRSVP(Event event, User user, Event.RSVP rsvp)
+    public void setRSVP(String id, User user, Event.RSVP rsvp)
     {
-
+        throw new RepositoryActionNotAllowed();
     }
 
     @Override
-    public void createInvitation(Event event, User from, List<String> to)
+    public void createInvitation(String id, User from, List<String> to)
     {
-
+        throw new RepositoryActionNotAllowed();
     }
 
     @Override
-    public EventDetails getDetails(Event event, User user)
+    public EventDetails getDetails(String id, User user)
     {
-        return null;
+        try
+        {
+            UUID eventId = null;
+            Long userId = null;
+            try
+            {
+                eventId = UUID.fromString(id);
+                userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id/user_id");
+            }
+
+            EventDetails eventDetails = new EventDetails();
+            Set<EventDetails.Attendee> attendees = new HashSet<>();
+            Set<EventDetails.Invitee> invitees = new HashSet<>();
+            eventDetails.setAttendees(attendees);
+            eventDetails.setInvitee(invitees);
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_DETAILS_DESCRIPTION);
+
+            preparedStatement.setObject(1, eventId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                eventDetails.setDescription(resultSet.getString("description"));
+                break;
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+            preparedStatement = connection.prepareStatement(SQL_READ_DETAILS);
+
+            preparedStatement.setObject(1, eventId);
+            preparedStatement.setObject(2, eventId);
+            preparedStatement.setLong(3, userId);
+            preparedStatement.setLong(4, userId);
+            preparedStatement.setLong(5, userId);
+            preparedStatement.setObject(6, eventId);
+            preparedStatement.setLong(7, userId);
+
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                int type = resultSet.getInt("type");
+                if (type == 0)
+                {
+                    EventDetails.Attendee attendee = new EventDetails.Attendee();
+                    attendee.setId(resultSet.getString("user_id"));
+                    attendee.setName(resultSet.getString("name"));
+                    try
+                    {
+                        attendee.setRsvp(Event.RSVP.valueOf(resultSet.getString("rsvp_status").toUpperCase()));
+                    }
+                    catch (Exception e)
+                    {
+                        throw new SQLException("Unable to process rsvp status");
+                    }
+                    attendee.setFriend(resultSet.getBoolean("is_friend"));
+                    attendee.setInviter(resultSet.getBoolean("is_inviter"));
+
+                    attendees.add(attendee);
+                }
+                else
+                {
+                    EventDetails.Invitee invitee = new EventDetails.Invitee();
+                    invitee.setId(resultSet.getString("user_id"));
+                    invitee.setName(resultSet.getString("name"));
+
+                    invitees.add(invitee);
+                }
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+            return eventDetails;
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to read event details for event_id = " + id + "; [" + e.getMessage() + "]");
+            return null;
+        }
     }
 
     @Override

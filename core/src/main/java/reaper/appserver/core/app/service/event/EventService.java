@@ -1,6 +1,5 @@
 package reaper.appserver.core.app.service.event;
 
-import com.google.gson.Gson;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
 import reaper.appserver.persistence.core.RepositoryFactory;
@@ -9,9 +8,7 @@ import reaper.appserver.persistence.model.event.EventDetails;
 import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 public class EventService
@@ -132,7 +129,7 @@ public class EventService
                 throw new ServerError("Unable to create event; user_id = " + user.getId());
             }
 
-            eventRepository.setRSVP(event, user, Event.RSVP.YES);
+            eventRepository.setRSVP(event.getId(), user, Event.RSVP.YES);
 
             return eventId;
         }
@@ -149,13 +146,7 @@ public class EventService
             throw new BadRequest("Cannot delete event; invalid event_id");
         }
 
-        Event event = eventRepository.get(eventId);
-        if (event == null)
-        {
-            throw new BadRequest("Cannot get event from event_id  = " + eventId);
-        }
-
-        eventRepository.remove(event, user);
+        eventRepository.remove(eventId, user);
     }
 
     public EventDetails getDetails(String eventId, User user)
@@ -165,13 +156,7 @@ public class EventService
             throw new BadRequest("Cannot fetch event details; invalid event_id");
         }
 
-        Event event = eventRepository.get(eventId);
-        if (event == null)
-        {
-            throw new BadRequest("Cannot get event from event_id  = " + eventId);
-        }
-
-        EventDetails eventDetails = eventRepository.getDetails(event, user);
+        EventDetails eventDetails = eventRepository.getDetails(eventId, user);
         if (eventDetails == null)
         {
             throw new ServerError("Unable to fetch details for event_id = " + eventId);
@@ -194,14 +179,7 @@ public class EventService
             throw new BadRequest("Cannot set rsvp; invalid event_id");
         }
 
-        Event event = eventRepository.get(eventId);
-        if (event == null)
-        {
-            throw new BadRequest("Cannot get event from event_id  = " + eventId);
-        }
-
-        eventRepository.setRSVP(event, user, rsvp);
-
+        eventRepository.setRSVP(eventId, user, rsvp);
     }
 
     public void invite(String eventId, User user, List<String> invitedUsers)
@@ -211,13 +189,7 @@ public class EventService
             throw new BadRequest("Cannot invite; invalid event_id");
         }
 
-        Event event = eventRepository.get(eventId);
-        if (event == null)
-        {
-            throw new BadRequest("Cannot get event from event_id  = " + eventId);
-        }
-
-        eventRepository.createInvitation(event, user, invitedUsers);
+        eventRepository.createInvitation(eventId, user, invitedUsers);
     }
 
     public void update(String eventId, User user, String typeStr, String isFinalizedStr, String startTimeStr, String endTimeStr,
