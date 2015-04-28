@@ -1,8 +1,15 @@
 package reaper.appserver.persistence.model.event;
 
+import com.fatboyindustrial.gsonjavatime.Converters;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import reaper.appserver.persistence.core.Entity;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 public class Event implements Entity
 {
@@ -103,6 +110,47 @@ public class Event implements Entity
         }
     }
 
+    public static class Serializer
+    {
+        private static Gson gson;
+
+        static
+        {
+            GsonBuilder gsonBuilder = Converters.registerAll(new GsonBuilder().serializeNulls().addSerializationExclusionStrategy(new SerializerStrategy()));
+            gson = gsonBuilder.create();
+        }
+
+        private static class SerializerStrategy implements ExclusionStrategy
+        {
+            private static List<String> excluded = Arrays.asList("rsvp", "friendCount", "inviterCount");
+
+            @Override
+            public boolean shouldSkipField(FieldAttributes fieldAttributes)
+            {
+                System.out.println(fieldAttributes.getName());
+                if (excluded.contains(fieldAttributes.getName()))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> aClass)
+            {
+                return false;
+            }
+        }
+
+        public static String serialize(Event event)
+        {
+            return gson.toJson(event);
+        }
+    }
+
     private String id;
     private String title;
     private Type type;
@@ -118,7 +166,6 @@ public class Event implements Entity
     private RSVP rsvp;
     private int friendCount;
     private int inviterCount;
-    private int notificationCount;
 
     @Override
     public String getId()
@@ -259,16 +306,6 @@ public class Event implements Entity
     public void setInviterCount(int inviterCount)
     {
         this.inviterCount = inviterCount;
-    }
-
-    public int getNotificationCount()
-    {
-        return notificationCount;
-    }
-
-    public void setNotificationCount(int notificationCount)
-    {
-        this.notificationCount = notificationCount;
     }
 
     @Override

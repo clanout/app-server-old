@@ -1,25 +1,33 @@
 package reaper.appserver.persistence.model.event.postgre;
 
+import com.google.gson.Gson;
+import org.postgresql.geometric.PGpoint;
 import reaper.appserver.persistence.core.RepositoryActionNotAllowed;
 import reaper.appserver.persistence.core.postgre.AbstractPostgreRepository;
 import reaper.appserver.persistence.core.postgre.PostgreQuery;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
 import reaper.appserver.persistence.model.event.EventRepository;
+import reaper.appserver.persistence.model.event.EventUpdate;
 import reaper.appserver.persistence.model.user.User;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 public class PostgreEventRepository extends AbstractPostgreRepository<Event> implements EventRepository
 {
+    private static final String SQL_CREATE = PostgreQuery.load("event/create.sql");
+    private static final String SQL_CREATE_EXTRA = PostgreQuery.load("event/create_extra.sql");
+
     private static final String SQL_READ = PostgreQuery.load("event/read.sql");
     private static final String SQL_READ_VISIBLE = PostgreQuery.load("event/read_visible.sql");
     private static final String SQL_READ_DETAILS = PostgreQuery.load("event/read_details.sql");
     private static final String SQL_READ_DETAILS_DESCRIPTION = PostgreQuery.load("event/read_details_description.sql");
+
+    private static final String SQL_CREATE_INVITATION = PostgreQuery.load("event/create_invitation.sql");
+
+    private static final String SQL_UPDATE_RSVP = PostgreQuery.load("event/update_rsvp.sql");
 
     public PostgreEventRepository()
     {
@@ -86,7 +94,125 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     @Override
     public String create(Event event, String description)
     {
-        throw new RepositoryActionNotAllowed();
+        Connection connection = null;
+
+        try
+        {
+            UUID eventId = null;
+            Long organizerId = null;
+            try
+            {
+                organizerId = Long.parseLong(event.getOrganizerId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid organizer_id");
+            }
+
+
+            connection = getConnection();
+            connection.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, event.getTitle());
+            preparedStatement.setInt(2, event.getType().getCode());
+            preparedStatement.setString(3, event.getCategory());
+            preparedStatement.setTimestamp(4, Timestamp.from(event.getStartTime().toInstant()));
+            preparedStatement.setTimestamp(5, Timestamp.from(event.getEndTime().toInstant()));
+            preparedStatement.setLong(6, organizerId);
+            preparedStatement.setString(7, event.getChatId());
+            preparedStatement.setBoolean(8, event.isFinalized());
+
+            preparedStatement.executeUpdate();
+
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            while (resultSet.next())
+            {
+                event.setId(resultSet.getString(1));
+                break;
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+            try
+            {
+                eventId = UUID.fromString(event.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id (" + event.getId() + ")");
+            }
+
+            preparedStatement = connection.prepareStatement(SQL_CREATE_EXTRA);
+
+            // Location
+            Event.Location location = event.getLocation();
+            preparedStatement.setObject(1, eventId);
+
+            PGpoint coordinates = new PGpoint(-1.0, -1.0);
+            if (location.getY() != null && location.getY() != null)
+            {
+                coordinates = new PGpoint(location.getX(), location.getY());
+            }
+            preparedStatement.setObject(2, coordinates);
+
+            if (location.getName() != null)
+            {
+                preparedStatement.setString(3, location.getName());
+            }
+            else
+            {
+                preparedStatement.setNull(3, Types.VARCHAR);
+            }
+
+            preparedStatement.setString(4, location.getZone());
+
+            // Description
+            preparedStatement.setObject(5, eventId);
+            if (description == null)
+            {
+                description = "";
+            }
+            preparedStatement.setString(6, description);
+
+            // Attendee status of organizer
+            preparedStatement.setObject(7, eventId);
+            preparedStatement.setLong(8, organizerId);
+
+            // Event updates table
+            preparedStatement.setObject(9, eventId);
+            preparedStatement.setLong(10, organizerId);
+            preparedStatement.setString(11, String.valueOf(EventUpdate.CREATE));
+            preparedStatement.setString(12, Event.Serializer.serialize(event));
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+            connection.commit();
+            connection.close();
+
+            return event.getId();
+        }
+        catch (SQLException e)
+        {
+            try
+            {
+                if (connection != null)
+                {
+                    connection.rollback();
+                    connection.close();
+                }
+            }
+            catch (SQLException e1)
+            {
+                log.error(e1.getMessage());
+            }
+
+            log.error("Unable to create new event; [" + e.getMessage() + "]");
+            return null;
+        }
     }
 
     @Override
@@ -151,13 +277,80 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     @Override
     public void setRSVP(String id, User user, Event.RSVP rsvp)
     {
-        throw new RepositoryActionNotAllowed();
+        try
+        {
+            UUID eventId = null;
+            Long userId = null;
+            try
+            {
+                eventId = UUID.fromString(id);
+                userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id/user_id");
+            }
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_RSVP);
+
+            preparedStatement.setString(1, String.valueOf(rsvp));
+            preparedStatement.setObject(2, eventId);
+            preparedStatement.setLong(3, userId);
+
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to set RSVP for user_id = " + user.getId() + " for event_id = " + id + "; [" + e.getMessage() + "]");
+        }
     }
 
     @Override
     public void createInvitation(String id, User from, List<String> to)
     {
-        throw new RepositoryActionNotAllowed();
+        try
+        {
+            UUID eventId = null;
+            Long userId = null;
+            List<Long> friendIds = new ArrayList<>();
+            try
+            {
+                eventId = UUID.fromString(id);
+                userId = Long.parseLong(from.getId());
+                for (String friendId : to)
+                {
+                    friendIds.add(Long.parseLong(friendId));
+                }
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id/user_id/friend_ids");
+            }
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE_INVITATION);
+
+            for (Long friendId : friendIds)
+            {
+                preparedStatement.setObject(1, eventId);
+                preparedStatement.setLong(2, friendId);
+                preparedStatement.setLong(3, userId);
+                preparedStatement.addBatch();
+            }
+
+            preparedStatement.executeBatch();
+
+            preparedStatement.close();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to create invitations fro user_id = " + from.getId() + " for event_id = " + id + " [" + e.getMessage() + "]");
+        }
     }
 
     @Override

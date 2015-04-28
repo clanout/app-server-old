@@ -27,22 +27,4 @@ public abstract class AbstractPostgreRepository<E extends Entity> implements Rep
         PostgreDataSource postgreDataSource = PostgreDataSource.getInstance();
         return postgreDataSource.getConnection();
     }
-
-    protected void close(Connection connection) throws SQLException
-    {
-        connection.close();
-    }
-
-    protected void close(Statement statement, Connection connection) throws SQLException
-    {
-        statement.close();
-        connection.close();
-    }
-
-    protected void close(ResultSet resultSet, Statement statement, Connection connection) throws SQLException
-    {
-        resultSet.close();
-        statement.close();
-        connection.close();
-    }
 }
