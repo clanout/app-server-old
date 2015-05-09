@@ -33,39 +33,19 @@ public class Main
 
         User user = userRepository.get("9320369679");
 
-        Event event = new Event();
-        event.setOrganizerId(user.getId());
-        event.setType(Event.Type.PUBLIC);
-        event.setTitle("Dummy Event");
-        event.setCategory("General");
-        event.setStartTime(OffsetDateTime.now());
-        event.setEndTime(OffsetDateTime.now().plusHours(1));
-        event.setFinalized(false);
+        Event event = eventRepository.get("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user);
+        System.out.println(event);
 
-        Event.Location location = new Event.Location();
-        location.setX(77.0);
-        location.setY(12.5);
-        location.setName("Arekere");
-        location.setZone("Bangalore");
+        eventRepository.remove(event, user);
 
-        event.setLocation(location);
+        event = eventRepository.get("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user);
+        System.out.println(event);
 
-        event.setChatId("12345");
-
-        String eventid = eventRepository.create(event, "Dummy Description");
-        System.out.println(eventid);
-
+//        List<Event> events = eventRepository.getVisibleEvents(user, "Bangalore");
+//        events.forEach(event -> System.out.println(event.getId()));
 //
-//        User user = userRepository.get("9320369679");
-//        System.out.println(user);
-//
-//        eventRepository.setRSVP("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user, Event.RSVP.YES);
-//
-//        System.out.println((new GsonBuilder().setPrettyPrinting().create()).toJson(eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user)));
-
-//        EventDetails eventDetails = eventRepository.getDetails("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
-//        System.out.println((new GsonBuilder().setPrettyPrinting().create()).toJson(eventDetails));
-
+//        System.out.println(new Gson().toJson(eventRepository.getDetails("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user)));
+//        System.out.println(new Gson().toJson(eventRepository.get("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user)));
 
         postgreDatabaseAdapter.close();
     }

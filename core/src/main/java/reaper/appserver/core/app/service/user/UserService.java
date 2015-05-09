@@ -95,6 +95,19 @@ public class UserService
         return friends;
     }
 
+    public Set<UserDetails.Friend> getLocalFriends(User user, String zone)
+    {
+        UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId(), zone);
+        if (userDetails == null)
+        {
+            throw new ServerError("Unable to fetch user details for user_id = " + user.getId());
+        }
+
+        Set<UserDetails.Friend> friends = userDetails.getFriends();
+
+        return friends;
+    }
+
     public void toggleBlock(User user, List<String> blockIds, List<String> unblockIds)
     {
         userRepository.unblock(user, unblockIds);

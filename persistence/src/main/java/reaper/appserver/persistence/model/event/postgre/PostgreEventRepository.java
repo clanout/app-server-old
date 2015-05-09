@@ -1,6 +1,5 @@
 package reaper.appserver.persistence.model.event.postgre;
 
-import com.google.gson.Gson;
 import org.postgresql.geometric.PGpoint;
 import reaper.appserver.persistence.core.RepositoryActionNotAllowed;
 import reaper.appserver.persistence.core.postgre.AbstractPostgreRepository;
@@ -12,7 +11,6 @@ import reaper.appserver.persistence.model.event.EventUpdate;
 import reaper.appserver.persistence.model.user.User;
 
 import java.sql.*;
-import java.time.OffsetDateTime;
 import java.util.*;
 
 public class PostgreEventRepository extends AbstractPostgreRepository<Event> implements EventRepository
@@ -25,9 +23,14 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     private static final String SQL_READ_DETAILS = PostgreQuery.load("event/read_details.sql");
     private static final String SQL_READ_DETAILS_DESCRIPTION = PostgreQuery.load("event/read_details_description.sql");
 
+    private static final String SQL_UPDATE = PostgreQuery.load("event/update.sql");
+
+    private static final String SQL_DELETE = PostgreQuery.load("event/delete.sql");
+
     private static final String SQL_CREATE_INVITATION = PostgreQuery.load("event/create_invitation.sql");
 
     private static final String SQL_UPDATE_RSVP = PostgreQuery.load("event/update_rsvp.sql");
+    private static final String SQL_DELETE_RSVP = PostgreQuery.load("event/delete_rsvp.sql");
 
     public PostgreEventRepository()
     {
@@ -42,35 +45,41 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         try
         {
             UUID eventId = null;
+            Long userId = null;
+
             try
             {
                 eventId = UUID.fromString(id);
-            }
-            catch (Exception e)
-            {
-                throw new SQLException("Invalid event_id");
-            }
-            Long userId = null;
-            try
-            {
                 userId = Long.parseLong(user.getId());
             }
             catch (Exception e)
             {
-                throw new SQLException("Invalid user_id");
+                throw new SQLException("Invalid event_id/user_id");
             }
 
             Connection connection = getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ);
 
-            preparedStatement.setLong(1, userId);
-            preparedStatement.setLong(2, userId);
+//            preparedStatement.setLong(1, userId);
+//            preparedStatement.setLong(2, userId);
+//            preparedStatement.setObject(3, eventId);
+//            preparedStatement.setObject(4, eventId);
+//            preparedStatement.setObject(5, eventId);
+//            preparedStatement.setLong(6, userId);
+//            preparedStatement.setObject(7, eventId);
+//            preparedStatement.setObject(8, eventId);
+
+            preparedStatement.setObject(1, eventId);
+            preparedStatement.setObject(2, eventId);
             preparedStatement.setObject(3, eventId);
             preparedStatement.setObject(4, eventId);
-            preparedStatement.setObject(5, eventId);
-            preparedStatement.setLong(6, userId);
+            preparedStatement.setLong(5, userId);
+            preparedStatement.setObject(6, eventId);
             preparedStatement.setObject(7, eventId);
-            preparedStatement.setObject(8, eventId);
+            preparedStatement.setLong(8, userId);
+            preparedStatement.setLong(9, userId);
+            preparedStatement.setLong(10, userId);
+            preparedStatement.setObject(11, eventId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
@@ -218,13 +227,145 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     @Override
     public void update(Event event, User user, String description)
     {
-        throw new RepositoryActionNotAllowed();
+        Connection connection = null;
+
+        try
+        {
+            UUID eventId = null;
+            try
+            {
+                eventId = UUID.fromString(event.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id");
+            }
+
+            connection = getConnection();
+            connection.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE);
+
+            preparedStatement.setInt(1, event.getType().getCode());
+            preparedStatement.setString(2, event.getCategory());
+            preparedStatement.setBoolean(3, event.isFinalized());
+            preparedStatement.setTimestamp(4, Timestamp.from(event.getStartTime().toInstant()));
+            preparedStatement.setTimestamp(5, Timestamp.from(event.getEndTime().toInstant()));
+            preparedStatement.setObject(6, eventId);
+
+            // Location
+            Event.Location location = event.getLocation();
+
+            if (location.getName() != null)
+            {
+                preparedStatement.setString(7, location.getName());
+            }
+            else
+            {
+                preparedStatement.setNull(7, Types.VARCHAR);
+            }
+
+            PGpoint coordinates = new PGpoint(-1.0, -1.0);
+            if (location.getY() != null && location.getY() != null)
+            {
+                coordinates = new PGpoint(location.getX(), location.getY());
+            }
+            preparedStatement.setObject(8, coordinates);
+
+            preparedStatement.setString(9, location.getZone());
+            preparedStatement.setObject(10, eventId);
+
+            preparedStatement.setString(11, description);
+            preparedStatement.setObject(12, eventId);
+
+            preparedStatement.setObject(13, eventId);
+            preparedStatement.setLong(14, Long.parseLong(user.getId()));
+            preparedStatement.setString(15, String.valueOf(EventUpdate.EDIT));
+            preparedStatement.setString(16, Event.Serializer.serialize(event));
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+            connection.commit();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            if (connection != null)
+            {
+                try
+                {
+                    connection.rollback();
+                    connection.close();
+                }
+                catch (SQLException e1)
+                {
+                    log.error(e1);
+                }
+            }
+
+            log.error("Unable to update event with event_id = " + event.getId() + " [" + e.getMessage() + "]");
+        }
     }
 
     @Override
-    public void remove(String id, User user)
+    public void remove(Event event, User user)
     {
-        throw new RepositoryActionNotAllowed();
+        Connection connection = null;
+
+        try
+        {
+            if (!event.getOrganizerId().equals(user.getId()))
+            {
+                throw new SQLException("User (user_id = " + user.getId() + ") is not the evnt organizer");
+            }
+
+            UUID eventId = null;
+            try
+            {
+                eventId = UUID.fromString(event.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id");
+            }
+
+            connection = getConnection();
+            connection.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
+
+            preparedStatement.setObject(1, eventId);
+
+            preparedStatement.setObject(2, eventId);
+            preparedStatement.setLong(3, Long.parseLong(user.getId()));
+            preparedStatement.setString(4, String.valueOf(EventUpdate.REMOVE));
+            preparedStatement.setString(5, Event.Serializer.serialize(event));
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+            connection.commit();
+
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            if (connection != null)
+            {
+                try
+                {
+                    connection.rollback();
+                    connection.close();
+                }
+                catch (SQLException e1)
+                {
+                    log.error(e1.getMessage());
+                }
+            }
+
+            log.error("Unable to delete event with event_id = " + event.getId() + " [" + e.getMessage() + "]");
+        }
     }
 
     @Override
@@ -250,9 +391,11 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setLong(2, userId);
             preparedStatement.setLong(3, userId);
             preparedStatement.setLong(4, userId);
-            preparedStatement.setLong(5, userId);
+            preparedStatement.setString(5, zone);
             preparedStatement.setLong(6, userId);
-            preparedStatement.setString(7, zone);
+            preparedStatement.setLong(7, userId);
+            preparedStatement.setLong(8, userId);
+            preparedStatement.setLong(9, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
@@ -292,15 +435,29 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             }
 
             Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_RSVP);
 
-            preparedStatement.setString(1, String.valueOf(rsvp));
-            preparedStatement.setObject(2, eventId);
-            preparedStatement.setLong(3, userId);
+            if (rsvp == Event.RSVP.NO)
+            {
+                PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_RSVP);
 
-            preparedStatement.executeUpdate();
+                preparedStatement.setObject(1, eventId);
+                preparedStatement.setLong(2, userId);
 
-            preparedStatement.close();
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            }
+            else
+            {
+                PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_RSVP);
+
+                preparedStatement.setString(1, String.valueOf(rsvp));
+                preparedStatement.setObject(2, eventId);
+                preparedStatement.setLong(3, userId);
+
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            }
+
             connection.close();
         }
         catch (SQLException e)

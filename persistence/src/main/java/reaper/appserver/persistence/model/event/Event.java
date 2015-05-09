@@ -127,7 +127,6 @@ public class Event implements Entity
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes)
             {
-                System.out.println(fieldAttributes.getName());
                 if (excluded.contains(fieldAttributes.getName()))
                 {
                     return true;
@@ -162,6 +161,7 @@ public class Event implements Entity
     private Location location;
     private int attendeeCount;
     private String chatId;
+    private OffsetDateTime updateTime;
 
     private RSVP rsvp;
     private int friendCount;
@@ -276,6 +276,16 @@ public class Event implements Entity
     public void setChatId(String chatId)
     {
         this.chatId = chatId;
+    }
+
+    public OffsetDateTime getUpdateTime()
+    {
+        return updateTime;
+    }
+
+    public void setUpdateTime(OffsetDateTime updateTime)
+    {
+        this.updateTime = updateTime;
     }
 
     public RSVP getRsvp()

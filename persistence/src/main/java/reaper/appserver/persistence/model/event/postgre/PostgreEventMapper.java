@@ -51,13 +51,33 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         Event.Location location = new Event.Location();
         location.setX(resultSet.getDouble("longitude"));
         location.setY(resultSet.getDouble("latitude"));
-        location.setName(resultSet.getString("name"));
-        location.setZone(resultSet.getString("city_cell"));
+        location.setName(resultSet.getString("location_name"));
+        location.setZone(resultSet.getString("location_zone"));
         event.setLocation(location);
 
         event.setAttendeeCount(resultSet.getInt("attendee_count"));
         event.setFriendCount(resultSet.getInt("friend_count"));
         event.setInviterCount(resultSet.getInt("inviter_count"));
+
+        try
+        {
+            event.setRsvp(Event.RSVP.valueOf(resultSet.getString("rsvp_status")));
+        }
+        catch (Exception e)
+        {
+            event.setRsvp(Event.RSVP.NO);
+        }
+
+        try
+        {
+            Timestamp timestamp = resultSet.getTimestamp("update_time");
+            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+            event.setUpdateTime(time);
+        }
+        catch (Exception e)
+        {
+            throw new SQLException("Unable to process update_time (timestamp)");
+        }
 
         return event;
     }

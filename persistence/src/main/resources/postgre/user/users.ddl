@@ -26,6 +26,15 @@ CREATE TABLE user_relationships
   ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE user_location
+(
+  user_id BIGINT,
+  zone    TEXT NOT NULL,
+  CONSTRAINT user_location_user_id_fkey FOREIGN KEY (user_id)
+  REFERENCES user_info (user_id) MATCH SIMPLE
+  ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 CREATE TABLE user_favourites
 (
   faver_id BIGINT,

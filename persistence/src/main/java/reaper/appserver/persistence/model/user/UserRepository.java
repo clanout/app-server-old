@@ -10,6 +10,8 @@ public interface UserRepository extends Repository<User>
 
     public UserDetails getUserDetails(String id);
 
+    public UserDetails getUserDetailsLocal(String id, String zone);
+
     public void block(User user, List<String> userIds);
 
     public void unblock(User user, List<String> userIds);

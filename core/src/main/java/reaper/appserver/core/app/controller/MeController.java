@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import reaper.appserver.core.app.controller.core.BaseController;
 import reaper.appserver.core.framework.exceptions.BadRequest;
+import reaper.appserver.core.framework.exceptions.ServerError;
 import reaper.appserver.core.framework.request.Request;
 import reaper.appserver.core.framework.response.ResponseFactory;
 import reaper.appserver.persistence.model.event.Event;
@@ -22,9 +23,27 @@ public class MeController extends BaseController
 
     public void friendsAction()
     {
-        Set<UserDetails.Friend> friends = userService.getFriends(activeUser);
+        String zone = null;
 
-        response.set("friends", friends);
+        try
+        {
+            zone = request.getData("zone");
+        }
+        catch (Exception e)
+        {
+            throw new ServerError("Unable to process /me/friends request");
+        }
+
+        if (zone == null)
+        {
+            Set<UserDetails.Friend> friends = userService.getFriends(activeUser);
+            response.set("friends", friends);
+        }
+        else
+        {
+            Set<UserDetails.Friend> localFriends = userService.getLocalFriends(activeUser, zone);
+            response.set("friends", localFriends);
+        }
     }
 
     public void blockAction()

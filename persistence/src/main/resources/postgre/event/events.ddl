@@ -63,3 +63,21 @@ CREATE TABLE event_invitees
   REFERENCES user_info (user_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+CREATE TABLE event_updates
+(
+  event_id    UUID,
+  user_id     BIGINT,
+  update_time TIMESTAMP WITH TIME ZONE,
+  update_type TEXT,
+  message     TEXT
+);
+
+CREATE TABLE event_archive
+(
+  event_id    UUID,
+  user_id     BIGINT,
+  update_time TIMESTAMP WITH TIME ZONE,
+  update_type TEXT,
+  message     TEXT
+);

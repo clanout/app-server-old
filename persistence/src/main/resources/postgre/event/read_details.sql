@@ -16,13 +16,13 @@
      FROM event_attendees a, user_info b
      WHERE event_id = ?
            AND a.attendee_id = b.user_id) AS attendees
-    LEFT OUTER JOIN
+    LEFT JOIN
     (SELECT inviter_id
      FROM event_invitees
      WHERE event_id = ?
            AND invitee_id = ?) AS inviters
       ON attendees.attendee_id = inviters.inviter_id
-    LEFT OUTER JOIN
+    LEFT JOIN
     (
       (
         SELECT user_id1 AS friend_id

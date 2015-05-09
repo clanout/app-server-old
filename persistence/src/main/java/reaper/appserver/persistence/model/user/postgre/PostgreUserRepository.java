@@ -21,6 +21,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
     private static final String SQL_UPDATE = PostgreQuery.load("user/update.sql");
 
     private static final String SQL_READ_DETAILS = PostgreQuery.load("user/read_details.sql");
+    private static final String SQL_READ_DETAILS_LOCAL = PostgreQuery.load("user/read_details_local.sql");
 
     private static final String SQL_CREATE_FRIEND = PostgreQuery.load("user/create_friend.sql");
 
@@ -214,6 +215,59 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             preparedStatement.setLong(1, userId);
             preparedStatement.setLong(2, userId);
             preparedStatement.setLong(3, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                UserDetails.Friend friend = new UserDetails.Friend();
+                friend.setId(resultSet.getString("friend_id"));
+                friend.setName(resultSet.getString("name"));
+                friend.setBlocked(resultSet.getBoolean("is_blocked"));
+                friend.setFavourite(resultSet.getBoolean("is_favourite"));
+
+                friends.add(friend);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+            return userDetails;
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to read details for user with user_id = " + id + "; [" + e.getMessage() + "]");
+            return null;
+        }
+    }
+
+    @Override
+    public UserDetails getUserDetailsLocal(String id, String zone)
+    {
+        try
+        {
+            Long userId = null;
+            try
+            {
+                userId = Long.parseLong(id);
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            UserDetails userDetails = new UserDetails();
+            userDetails.setId(id);
+            Set<UserDetails.Friend> friends = new HashSet<>();
+            userDetails.setFriends(friends);
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_DETAILS_LOCAL);
+
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, userId);
+            preparedStatement.setString(3, zone);
+            preparedStatement.setLong(4, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())

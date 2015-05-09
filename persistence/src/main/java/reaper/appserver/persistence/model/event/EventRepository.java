@@ -13,7 +13,7 @@ public interface EventRepository extends Repository<Event>
 
     public void update(Event event, User user, String description);
 
-    public void remove(String id, User user);
+    public void remove(Event event, User user);
 
     public List<Event> getVisibleEvents(User user, String zone);
 
