@@ -146,7 +146,13 @@ public class EventService
             throw new BadRequest("Cannot delete event; invalid event_id");
         }
 
-        eventRepository.remove(eventId, user);
+        Event event = eventRepository.get(eventId, user);
+        if (event == null)
+        {
+            throw new BadRequest("Cannot delete event; invalid event_id");
+        }
+
+        eventRepository.remove(event, user);
     }
 
     public EventDetails getDetails(String eventId, User user)
