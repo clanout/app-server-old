@@ -53,8 +53,8 @@ public class MeController extends BaseController
 
         try
         {
-            String blockIdListJson = request.getData("block_ids");
-            String unblockIdListJson = request.getData("unblock_ids");
+            String blockIdListJson = request.getData("blocked_users");
+            String unblockIdListJson = request.getData("unblocked_users");
             Type type = new TypeToken<List<String>>()
             {
             }.getType();

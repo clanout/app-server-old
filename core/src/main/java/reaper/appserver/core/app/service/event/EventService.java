@@ -1,7 +1,10 @@
 package reaper.appserver.core.app.service.event;
 
+import org.apache.log4j.Logger;
+import reaper.appserver.core.app.service.chat.ChatService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
+import reaper.appserver.log.LogUtil;
 import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
@@ -9,15 +12,18 @@ import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventService
 {
     private EventRepository eventRepository;
+    private ChatService chatService;
 
     public EventService()
     {
         eventRepository = RepositoryFactory.create(Event.class);
+        chatService = new ChatService();
     }
 
     public Event getEvent(User user, String eventId)
@@ -129,6 +135,16 @@ public class EventService
                 throw new ServerError("Unable to create event; user_id = " + user.getId());
             }
 
+            try
+            {
+                chatService.createChatroom(eventId);
+            }
+            catch (ServerError e)
+            {
+                eventRepository.remove(event, user);
+                throw new ServerError("Unable to create event because chatroom creation failed (" + e.getMessage() + ")");
+            }
+
             eventRepository.setRSVP(event.getId(), user, Event.RSVP.YES);
 
             return eventId;
@@ -201,6 +217,8 @@ public class EventService
     public void update(String eventId, User user, String typeStr, String isFinalizedStr, String startTimeStr, String endTimeStr,
                        String locationLatitude, String locationLongitude, String locationName, String locationZone, String description)
     {
+        List<String> chatUpdates = new ArrayList<>();
+
         if (eventId == null || eventId.isEmpty())
         {
             throw new BadRequest("Cannot edit event; invalid event_id");
@@ -220,6 +238,8 @@ public class EventService
                 {
                     Event.Type type = Event.Type.valueOf(typeStr.toUpperCase());
                     event.setType(type);
+
+                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event type");
                 }
                 catch (Exception e)
                 {
@@ -231,6 +251,15 @@ public class EventService
             {
                 boolean isFinalized = Boolean.parseBoolean(isFinalizedStr);
                 event.setFinalized(isFinalized);
+
+                if (isFinalized)
+                {
+                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has finalized this event");
+                }
+                else
+                {
+                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has unlocked this event");
+                }
             }
 
             if (startTimeStr != null && endTimeStr != null)
@@ -242,6 +271,8 @@ public class EventService
 
                     event.setStartTime(startTime);
                     event.setEndTime(endTime);
+
+                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event timings");
                 }
                 catch (Exception e)
                 {
@@ -261,6 +292,8 @@ public class EventService
 
                     location.setX(x);
                     location.setY(y);
+
+                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event location");
                 }
                 catch (NumberFormatException e)
                 {
@@ -271,6 +304,11 @@ public class EventService
             }
 
             eventRepository.update(event, user, description);
+
+            for (String chatUpdate : chatUpdates)
+            {
+                chatService.postMessages(eventId, chatUpdate);
+            }
         }
         catch (Exception e)
         {

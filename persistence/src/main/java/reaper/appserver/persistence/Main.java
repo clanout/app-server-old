@@ -33,16 +33,8 @@ public class Main
 
         User user = userRepository.get("9320369679");
 
-        Event event = eventRepository.get("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user);
-        System.out.println(event);
-
-        eventRepository.remove(event, user);
-
-        event = eventRepository.get("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user);
-        System.out.println(event);
-
-//        List<Event> events = eventRepository.getVisibleEvents(user, "Bangalore");
-//        events.forEach(event -> System.out.println(event.getId()));
+        List<Event> events = eventRepository.getVisibleEvents(user, "Bangalore");
+        events.forEach(event -> System.out.println(event.getId()));
 //
 //        System.out.println(new Gson().toJson(eventRepository.getDetails("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user)));
 //        System.out.println(new Gson().toJson(eventRepository.get("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user)));
