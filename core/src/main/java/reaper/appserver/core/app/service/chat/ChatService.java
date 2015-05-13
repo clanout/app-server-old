@@ -13,6 +13,8 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.xdata.Form;
 import org.jivesoftware.smackx.xdata.FormField;
+import reaper.appserver.config.ConfLoader;
+import reaper.appserver.config.ConfResource;
 import reaper.appserver.core.framework.exceptions.ServerError;
 import reaper.appserver.persistence.model.user.User;
 
@@ -23,15 +25,15 @@ import java.util.Map;
 
 public class ChatService
 {
-    private static String XMPP_SERVICE_NAME = "192.168.0.158";
-    private static String XMPP_HOST_NAME = "192.168.0.158";
-    private static int XMPP_PORT = 5222;
+    private static String XMPP_SERVICE_NAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.service");
+    private static String XMPP_HOST_NAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.host");
+    private static int XMPP_PORT = Integer.parseInt(ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.port"));
 
-    private static String ADMIN_USERNAME = "admin";
-    private static String ADMIN_PASSWORD = "reaper";
-    private static String ADMIN_NICKNAME = "@reap3r";
+    private static String ADMIN_USERNAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.username");
+    private static String ADMIN_PASSWORD = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.password");
+    private static String ADMIN_NICKNAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.nickname");
 
-    private static String XMPP_CHATROOM_POSTFIX = "@conference.192.168.0.158";
+    private static String XMPP_CHATROOM_POSTFIX = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.chatroom_postfix");
 
     private AbstractXMPPConnection getXMPPConnection() throws IOException, XMPPException, SmackException
     {

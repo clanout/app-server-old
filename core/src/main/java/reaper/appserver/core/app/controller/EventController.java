@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import reaper.appserver.core.app.controller.core.BaseController;
 import reaper.appserver.core.app.service.event.EventService;
+import reaper.appserver.core.app.service.recommendation.Recommendation;
+import reaper.appserver.core.app.service.recommendation.RecommendationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.request.Request;
 import reaper.appserver.core.framework.response.ResponseFactory;
@@ -122,5 +124,18 @@ public class EventController extends BaseController
 
         eventService.update(eventId, activeUser, type, isFinalized, startTime, endTime,
                 locationLatitude, locationLongitude, locationName, locationZone, description);
+    }
+
+    public void recommendationsAction()
+    {
+        String latitude = request.getData("latitude");
+        String longitude = request.getData("longitude");
+        String category = request.getData("category");
+
+
+        RecommendationService recommendationService = new RecommendationService();
+        List<Recommendation> recommendations = recommendationService.getRecommendations(latitude, longitude, category);
+
+        response.set("recommendations", recommendations);
     }
 }

@@ -66,7 +66,7 @@ public abstract class ApplicationController implements Controller
                 }
                 else
                 {
-                    throw new ServerError(e.getMessage());
+                    throw new ServerError(cause.getMessage());
                 }
             }
         }

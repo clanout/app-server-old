@@ -307,7 +307,7 @@ public class EventService
 
             for (String chatUpdate : chatUpdates)
             {
-                chatService.postMessages(eventId, chatUpdate);
+                chatService.postMessages(event.getChatId(), chatUpdate);
             }
         }
         catch (Exception e)

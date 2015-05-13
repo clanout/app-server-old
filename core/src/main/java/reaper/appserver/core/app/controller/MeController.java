@@ -23,16 +23,7 @@ public class MeController extends BaseController
 
     public void friendsAction()
     {
-        String zone = null;
-
-        try
-        {
-            zone = request.getData("zone");
-        }
-        catch (Exception e)
-        {
-            throw new ServerError("Unable to process /me/friends request");
-        }
+        String zone = request.getData("zone");
 
         if (zone == null)
         {

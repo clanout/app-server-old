@@ -54,6 +54,14 @@
             <artifactId>smack-extensions</artifactId>
             <version>4.1.0</version>
         </dependency>
+
+        <!-- Apache HTTP Client -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.6</version>
+        </dependency>
+
     </dependencies>
 
     <build>

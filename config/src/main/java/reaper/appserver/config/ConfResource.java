@@ -8,7 +8,7 @@ public enum ConfResource
     SOURCE("source.conf"),
     DB("db.conf"),
     REPOSITORY("repository.conf"),
-    MOTIF("motif.conf");
+    CHAT("chat.conf");
 
     private String FILE;
 

@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -33,8 +34,19 @@ public class Main
 
         User user = userRepository.get("9320369679");
 
-        List<Event> events = eventRepository.getVisibleEvents(user, "Bangalore");
-        events.forEach(event -> System.out.println(event.getId()));
+        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
+        System.out.println(Event.Serializer.serialize(event));
+
+        OffsetDateTime time = OffsetDateTime.now(ZoneOffset.UTC);
+        System.out.println(time);
+
+        event.setEndTime(time);
+        eventRepository.update(event, user, "Timestamp test");
+
+        event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
+        System.out.println(Event.Serializer.serialize(event));
+
+
 //
 //        System.out.println(new Gson().toJson(eventRepository.getDetails("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user)));
 //        System.out.println(new Gson().toJson(eventRepository.get("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user)));
