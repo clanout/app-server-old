@@ -1,6 +1,8 @@
 package reaper.appserver.core.app.service.recommendation;
 
 import org.apache.log4j.Logger;
+import reaper.appserver.config.ConfLoader;
+import reaper.appserver.config.ConfResource;
 import reaper.appserver.core.app.service.http.BasicJsonParser;
 import reaper.appserver.core.app.service.http.HttpService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
@@ -15,11 +17,11 @@ public class RecommendationService
 
     private static Map<Category, List<String>> categoryMap;
 
-    private static final int RECOMMENDATION_COUNT = 7;
+    private static final int RECOMMENDATION_COUNT = Integer.parseInt(ConfLoader.getConf(ConfResource.RECOMMENDATION).get("recommendation.count"));
 
-    private static final String GOOGLE_API_KEY = "AIzaSyDBX362r-1isovteBR3tGN3QQtDcQn-jyg";
-    private static final String GOOGLE_PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-    private static int GOOGLE_PLACES_SEARCH_RADIUS = 5000;
+    private static final String GOOGLE_API_KEY = ConfLoader.getConf(ConfResource.RECOMMENDATION).get("recommendation.google.api_key");
+    private static final String GOOGLE_PLACES_SEARCH_URL = ConfLoader.getConf(ConfResource.RECOMMENDATION).get("recommendation.google.url");
+    private static int GOOGLE_PLACES_SEARCH_RADIUS = Integer.parseInt(ConfLoader.getConf(ConfResource.RECOMMENDATION).get("recommendation.google.search_radius"));
 
     private HttpService httpService;
 
@@ -108,7 +110,7 @@ public class RecommendationService
             urlBuilder.append(GOOGLE_API_KEY);
             String url = urlBuilder.toString();
 
-            log.info("[Google Places API request] " + url);
+            log.info("[Google Places API request] " + url.replace(GOOGLE_API_KEY, "..."));
 
             try
             {

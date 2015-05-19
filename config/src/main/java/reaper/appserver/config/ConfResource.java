@@ -8,7 +8,8 @@ public enum ConfResource
     SOURCE("source.conf"),
     DB("db.conf"),
     REPOSITORY("repository.conf"),
-    CHAT("chat.conf");
+    CHAT("chat.conf"),
+    RECOMMENDATION("recommendation.conf");
 
     private String FILE;
 

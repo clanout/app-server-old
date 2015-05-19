@@ -34,17 +34,20 @@ public class Main
 
         User user = userRepository.get("9320369679");
 
-        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
-        System.out.println(Event.Serializer.serialize(event));
+//        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
+//        System.out.println(Event.Serializer.serialize(event));
+//
+//        OffsetDateTime time = OffsetDateTime.now(ZoneOffset.UTC);
+//        System.out.println(time);
+//
+//        event.setEndTime(time);
+//        eventRepository.update(event, user, "Timestamp test");
+//
+//        event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
+//        System.out.println(Event.Serializer.serialize(event));
 
-        OffsetDateTime time = OffsetDateTime.now(ZoneOffset.UTC);
-        System.out.println(time);
-
-        event.setEndTime(time);
-        eventRepository.update(event, user, "Timestamp test");
-
-        event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
-        System.out.println(Event.Serializer.serialize(event));
+        List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
+        events.forEach(event -> System.out.println(event.getId()));
 
 
 //

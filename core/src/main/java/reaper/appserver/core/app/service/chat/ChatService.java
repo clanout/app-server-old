@@ -102,15 +102,23 @@ public class ChatService
         }
     }
 
-    public void postMessages(String eventId, String message) throws XMPPException, IOException, SmackException
+    public void postMessages(String eventId, String message)
     {
-        AbstractXMPPConnection connection = getXMPPConnection();
-        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
-        MultiUserChat muc = manager.getMultiUserChat(eventId + XMPP_CHATROOM_POSTFIX);
+        try
+        {
+            AbstractXMPPConnection connection = getXMPPConnection();
+            MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+            MultiUserChat muc = manager.getMultiUserChat(eventId + XMPP_CHATROOM_POSTFIX);
 
-        muc.join(ADMIN_NICKNAME);
+            muc.join(ADMIN_NICKNAME);
 
-        muc.sendMessage(message);
+            muc.sendMessage(message);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            throw new ServerError(e.getMessage());
+        }
     }
 
     public void readHistory(String eventId) throws XMPPException, IOException, SmackException
@@ -120,7 +128,7 @@ public class ChatService
         MultiUserChat muc = manager.getMultiUserChat(eventId + XMPP_CHATROOM_POSTFIX);
 
         DiscussionHistory history = new DiscussionHistory();
-        history.setMaxStanzas(2);
+        history.setMaxStanzas(100);
         muc.join(ADMIN_NICKNAME, null, history, connection.getPacketReplyTimeout());
 
         Message message = null;

@@ -112,7 +112,6 @@ public class EventController extends BaseController
     public void editAction()
     {
         String eventId = request.getData("event_id");
-        String type = request.getData("type");
         String isFinalized = request.getData("is_finalized");
         String startTime = request.getData("start_time");
         String endTime = request.getData("end_time");
@@ -122,8 +121,10 @@ public class EventController extends BaseController
         String locationZone = request.getData("location_zone");
         String description = request.getData("description");
 
-        eventService.update(eventId, activeUser, type, isFinalized, startTime, endTime,
+        Event event = eventService.update(eventId, activeUser, isFinalized, startTime, endTime,
                 locationLatitude, locationLongitude, locationName, locationZone, description);
+
+        response.set("event", event);
     }
 
     public void recommendationsAction()

@@ -1,4 +1,6 @@
-UPDATE event_attendees
-SET rsvp_status = ?
+DELETE FROM event_attendees
 WHERE event_id = ?
-      AND attendee_id = ?
+      AND attendee_id = ?;
+
+INSERT INTO event_attendees
+VALUES (?, ?, ?);

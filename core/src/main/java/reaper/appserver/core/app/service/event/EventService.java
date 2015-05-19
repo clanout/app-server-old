@@ -214,8 +214,8 @@ public class EventService
         eventRepository.createInvitation(eventId, user, invitedUsers);
     }
 
-    public void update(String eventId, User user, String typeStr, String isFinalizedStr, String startTimeStr, String endTimeStr,
-                       String locationLatitude, String locationLongitude, String locationName, String locationZone, String description)
+    public Event update(String eventId, User user, String isFinalizedStr, String startTimeStr, String endTimeStr,
+                        String locationLatitude, String locationLongitude, String locationName, String locationZone, String description)
     {
         List<String> chatUpdates = new ArrayList<>();
 
@@ -224,7 +224,7 @@ public class EventService
             throw new BadRequest("Cannot edit event; invalid event_id");
         }
 
-        Event event = eventRepository.get(eventId);
+        Event event = eventRepository.get(eventId, user);
         if (event == null)
         {
             throw new BadRequest("Cannot get event from event_id  = " + eventId);
@@ -232,21 +232,6 @@ public class EventService
 
         try
         {
-            if (typeStr != null)
-            {
-                try
-                {
-                    Event.Type type = Event.Type.valueOf(typeStr.toUpperCase());
-                    event.setType(type);
-
-                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event type");
-                }
-                catch (Exception e)
-                {
-                    throw new BadRequest("Event type invalid");
-                }
-            }
-
             if (isFinalizedStr != null)
             {
                 boolean isFinalized = Boolean.parseBoolean(isFinalizedStr);
@@ -280,7 +265,7 @@ public class EventService
                 }
             }
 
-            if (locationLatitude != null && locationLongitude != null && locationName != null && locationZone != null)
+            if (locationZone != null)
             {
                 Event.Location location = new Event.Location();
                 location.setName(locationName);
@@ -309,6 +294,8 @@ public class EventService
             {
                 chatService.postMessages(event.getChatId(), chatUpdate);
             }
+
+            return eventRepository.get(eventId, user);
         }
         catch (Exception e)
         {

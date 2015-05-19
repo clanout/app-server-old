@@ -450,9 +450,11 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             {
                 PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_RSVP);
 
-                preparedStatement.setString(1, String.valueOf(rsvp));
-                preparedStatement.setObject(2, eventId);
-                preparedStatement.setLong(3, userId);
+                preparedStatement.setObject(1, eventId);
+                preparedStatement.setLong(2, userId);
+                preparedStatement.setObject(3, eventId);
+                preparedStatement.setLong(4, userId);
+                preparedStatement.setString(5, String.valueOf(rsvp));
 
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
