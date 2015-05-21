@@ -87,7 +87,7 @@ public class UserService
         UserDetails userDetails = userRepository.getUserDetails(user.getId());
         if (userDetails == null)
         {
-            throw new ServerError("Unable to fetch user details for user_id = " + user.getId());
+            throw new ServerError("Unable to fetch friends for user_id = " + user.getId());
         }
 
         Set<UserDetails.Friend> friends = userDetails.getFriends();
@@ -100,7 +100,7 @@ public class UserService
         UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId(), zone);
         if (userDetails == null)
         {
-            throw new ServerError("Unable to fetch user details for user_id = " + user.getId());
+            throw new ServerError("Unable to local friends for user_id = " + user.getId());
         }
 
         Set<UserDetails.Friend> friends = userDetails.getFriends();
@@ -124,5 +124,18 @@ public class UserService
     {
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
         return eventRepository.getArchive(user);
+    }
+
+    public Set<UserDetails.Friend> getRegisteredContacts(User user, List<String> contacts)
+    {
+        UserDetails userDetails = userRepository.getRegisteredContacts(user, contacts);
+        if (userDetails == null)
+        {
+            throw new ServerError("Unable to fetch registered contacts for user_id = " + user.getId());
+        }
+
+        Set<UserDetails.Friend> registeredContacts = userDetails.getFriends();
+
+        return registeredContacts;
     }
 }

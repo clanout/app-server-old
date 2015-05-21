@@ -21,4 +21,6 @@ public interface UserRepository extends Repository<User>
     public void unfavourite(User user, List<String> userIds);
 
     public void addFriends(User user, List<String> userIds);
+
+    public UserDetails getRegisteredContacts(User user, List<String> contacts);
 }

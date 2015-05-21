@@ -101,4 +101,32 @@ public class MeController extends BaseController
 
         response.set("archive", archive);
     }
+
+    public void contactsAction()
+    {
+        List<String> contacts = null;
+
+        try
+        {
+            String contactsJson = request.getData("contacts");
+            Type type = new TypeToken<List<String>>()
+            {
+            }.getType();
+
+            contacts = (new Gson()).fromJson(contactsJson, type);
+
+            if (contacts == null)
+            {
+                throw new NullPointerException();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("Invalid list<contacts> to fetch registered contacts");
+        }
+
+        Set<UserDetails.Friend> registeredContacts = userService.getRegisteredContacts(activeUser, contacts);
+
+        response.set("registered_contacts", registeredContacts);
+    }
 }
