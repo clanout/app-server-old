@@ -1,10 +1,8 @@
 package reaper.appserver.core.app.service.event;
 
-import org.apache.log4j.Logger;
 import reaper.appserver.core.app.service.chat.ChatService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
-import reaper.appserver.log.LogUtil;
 import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
@@ -110,8 +108,8 @@ public class EventService
                     Double x = Double.parseDouble(locationLongitude);
                     Double y = Double.parseDouble(locationLatitude);
 
-                    location.setX(x);
-                    location.setY(y);
+                    location.setLongitude(x);
+                    location.setLatitude(y);
                 }
                 catch (NumberFormatException e)
                 {
@@ -275,8 +273,8 @@ public class EventService
                     Double x = Double.parseDouble(locationLongitude);
                     Double y = Double.parseDouble(locationLatitude);
 
-                    location.setX(x);
-                    location.setY(y);
+                    location.setLongitude(x);
+                    location.setLatitude(y);
 
                     chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event location");
                 }
@@ -301,5 +299,20 @@ public class EventService
         {
             throw new ServerError(e.getMessage());
         }
+    }
+
+    public List<Event> getUpdates(User user, String zone, String lastUpdatedStr)
+    {
+        OffsetDateTime lastUpdated = null;
+        try
+        {
+            lastUpdated = OffsetDateTime.parse(lastUpdatedStr);
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("Invalid last_updated timestamp");
+        }
+
+        return getEvents(user, zone);
     }
 }

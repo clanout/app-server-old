@@ -3,6 +3,7 @@ package reaper.appserver.persistence.model.event;
 import reaper.appserver.persistence.core.Repository;
 import reaper.appserver.persistence.model.user.User;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public interface EventRepository extends Repository<Event>
@@ -16,6 +17,8 @@ public interface EventRepository extends Repository<Event>
     public void remove(Event event, User user);
 
     public List<Event> getVisibleEvents(User user, String zone);
+
+    public List<Event> getUpdates(User user, String zone, OffsetDateTime lastUpdated);
 
     public void setRSVP(String id, User user, Event.RSVP rsvp);
 

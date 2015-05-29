@@ -34,6 +34,9 @@ public class Main
 
         User user = userRepository.get("9320369679");
 
+        List<Event> updates = eventRepository.getUpdates(user, "Bengaluru", OffsetDateTime.parse("2015-03-29T21:00:33.51+05:30"));
+        System.out.println(updates.size());
+
 //        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
 //        System.out.println(Event.Serializer.serialize(event));
 //
@@ -49,8 +52,8 @@ public class Main
 //        List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
 //        events.forEach(event -> System.out.println(event.getId()));
 
-        List<String> contacts = Arrays.asList("+91 (874) 574-3446", "+91 (986) 484-2619", "+91 (809) 567-2567", "+91 (879) 514-2853", "+91 (833) 509-2485");
-        System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(userRepository.getRegisteredContacts(user, contacts)));
+//        List<String> contacts = Arrays.asList("+91 (874) 574-3446", "+91 (986) 484-2619", "+91 (809) 567-2567", "+91 (879) 514-2853", "+91 (833) 509-2485");
+//        System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(userRepository.getRegisteredContacts(user, contacts)));
 
 
 //

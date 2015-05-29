@@ -139,4 +139,14 @@ public class EventController extends BaseController
 
         response.set("recommendations", recommendations);
     }
+
+    public void updatesAction()
+    {
+        String zone = request.getData("zone");
+        String lastUpdatedStr = request.getData("last_updated");
+
+        List<Event> events = eventService.getUpdates(activeUser, zone, lastUpdatedStr);
+
+        response.set("event_updates", events);
+    }
 }

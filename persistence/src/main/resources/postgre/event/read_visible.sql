@@ -40,7 +40,7 @@ FROM
   ) visible
   INNER JOIN event_info a ON visible.event_id = a.event_id
   INNER JOIN event_location b ON visible.event_id = b.event_id AND b.city_cell = ?
-  LEFT JOIN
+  INNER JOIN
   (
     SELECT
       event_id,

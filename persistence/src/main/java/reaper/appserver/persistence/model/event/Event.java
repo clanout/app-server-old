@@ -52,29 +52,29 @@ public class Event implements Entity
 
     public static class Location
     {
-        private Double x;
-        private Double y;
+        private Double longitude;
+        private Double latitude;
         private String name;
         private String zone;
 
-        public Double getX()
+        public Double getLongitude()
         {
-            return x;
+            return longitude;
         }
 
-        public void setX(double x)
+        public void setLongitude(double longitude)
         {
-            this.x = x;
+            this.longitude = longitude;
         }
 
-        public Double getY()
+        public Double getLatitude()
         {
-            return y;
+            return latitude;
         }
 
-        public void setY(double y)
+        public void setLatitude(double latitude)
         {
-            this.y = y;
+            this.latitude = latitude;
         }
 
         public String getName()

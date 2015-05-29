@@ -11,6 +11,7 @@ import reaper.appserver.persistence.model.event.EventUpdate;
 import reaper.appserver.persistence.model.user.User;
 
 import java.sql.*;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 public class PostgreEventRepository extends AbstractPostgreRepository<Event> implements EventRepository
@@ -22,6 +23,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     private static final String SQL_READ_VISIBLE = PostgreQuery.load("event/read_visible.sql");
     private static final String SQL_READ_DETAILS = PostgreQuery.load("event/read_details.sql");
     private static final String SQL_READ_DETAILS_DESCRIPTION = PostgreQuery.load("event/read_details_description.sql");
+    private static final String SQL_READ_UPDATES = PostgreQuery.load("event/read_updates.sql");
 
     private static final String SQL_UPDATE = PostgreQuery.load("event/update.sql");
 
@@ -161,9 +163,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setObject(1, eventId);
 
             PGpoint coordinates = new PGpoint(-1.0, -1.0);
-            if (location.getY() != null && location.getY() != null)
+            if (location.getLatitude() != null && location.getLatitude() != null)
             {
-                coordinates = new PGpoint(location.getX(), location.getY());
+                coordinates = new PGpoint(location.getLongitude(), location.getLatitude());
             }
             preparedStatement.setObject(2, coordinates);
 
@@ -266,9 +268,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             }
 
             PGpoint coordinates = new PGpoint(-1.0, -1.0);
-            if (location.getY() != null && location.getY() != null)
+            if (location.getLatitude() != null && location.getLatitude() != null)
             {
-                coordinates = new PGpoint(location.getX(), location.getY());
+                coordinates = new PGpoint(location.getLongitude(), location.getLatitude());
             }
             preparedStatement.setObject(8, coordinates);
 
@@ -415,6 +417,56 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         }
 
         return visibleEventsList;
+    }
+
+    @Override
+    public List<Event> getUpdates(User user, String zone, OffsetDateTime lastUpdated)
+    {
+        List<Event> eventUpdates = new ArrayList<Event>();
+        try
+        {
+            Long userId = null;
+            try
+            {
+                userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_UPDATES);
+
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, userId);
+            preparedStatement.setLong(3, userId);
+            preparedStatement.setLong(4, userId);
+            preparedStatement.setString(5, zone);
+            preparedStatement.setTimestamp(6, Timestamp.from(lastUpdated.toInstant()));
+            preparedStatement.setLong(7, userId);
+            preparedStatement.setLong(8, userId);
+            preparedStatement.setLong(9, userId);
+            preparedStatement.setLong(10, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                Event event = entityMapper.map(resultSet);
+                eventUpdates.add(event);
+
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to read event updates for user with id = " + user.getId() + "; [" + e.getMessage() + "]");
+        }
+
+        return eventUpdates;
     }
 
     @Override
