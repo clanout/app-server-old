@@ -313,6 +313,11 @@ public class EventService
             throw new BadRequest("Invalid last_updated timestamp");
         }
 
-        return getEvents(user, zone);
+        if (zone == null || zone.isEmpty())
+        {
+            throw new BadRequest("Zone not specified while fetching visible events");
+        }
+
+        return eventRepository.getUpdates(user, zone, lastUpdated);
     }
 }

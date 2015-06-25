@@ -1,0 +1,153 @@
+{
+  "data": {
+    "event_details_31e0cf42-90f9-4916-b051-b66a1a3f3ddf": {
+      "attendees": [
+        {
+          "id": "9320369679",
+          "rsvp": "MAYBE",
+          "name": "Lucas Johnson",
+          "isInviter": false,
+          "isFriend": false
+        }
+      ],
+      "description": "this is a party",
+      "id": "31e0cf42-90f9-4916-b051-b66a1a3f3ddf",
+      "invitee": []
+    },
+    "session_cookie": "dummy_session_cookie",
+    "events_timestamp": {
+      "iChronology": {
+        "iBase": {
+          "iBase": {
+            "iBase": {
+              "iMinDaysInFirstWeek": 4
+            }
+          },
+          "iParam": {
+            "iZone": {
+              "iNameKeys": [
+                "LMT",
+                "HMT",
+                "BURT",
+                "IST",
+                "IST",
+                "IST"
+              ],
+              "iStandardOffsets": [
+                21208000,
+                21200000,
+                23400000,
+                19800000,
+                19800000,
+                19800000
+              ],
+              "iTransitions": [
+                -9223372036854775808,
+                -2840162008000,
+                -891582800000,
+                -872058600000,
+                -862637400000,
+                -764145000000
+              ],
+              "iWallOffsets": [
+                21208000,
+                21200000,
+                23400000,
+                19800000,
+                23400000,
+                19800000
+              ],
+              "iID": "Asia/Kolkata"
+            },
+            "iID": "Asia/Kolkata"
+          }
+        }
+      },
+      "iMillis": 1433766094112
+    },
+    "location_longitude": 77.6047003,
+    "events": {
+      "086556a5-2b58-4b24-bfe7-4aeff9ee4743": {
+        "type": "PUBLIC",
+        "category": "GENERAL",
+        "chatId": "086556a5-2b58-4b24-bfe7-4aeff9ee4743",
+        "endTime": {
+          "iChronology": {
+            "iBase": {
+              "iBase": {
+                "iBase": {
+                  "iMinDaysInFirstWeek": 4
+                }
+              },
+              "iParam": {
+                "iStandardOffset": 19800000,
+                "iWallOffset": 19800000,
+                "iID": "+05:30"
+              }
+            }
+          },
+          "iMillis": 1432064160000
+        },
+        "title": "Dummy Event",
+        "id": "086556a5-2b58-4b24-bfe7-4aeff9ee4743",
+        "startTime": {
+          "iChronology": {
+            "iBase": {
+              "iBase": {
+                "iBase": {
+                  "iMinDaysInFirstWeek": 4
+                }
+              },
+              "iParam": {
+                "iStandardOffset": 19800000,
+                "iWallOffset": 19800000,
+                "iID": "+05:30"
+              }
+            }
+          },
+          "iMillis": 1432064160000
+        },
+        "rsvp": "YES",
+        "location": {
+          "latitude": 12.5,
+          "longitude": 77.0,
+          "name": "Arekere",
+          "zone": "Bengaluru"
+        },
+        "organizerId": "9320369679",
+        "isFinalized": false,
+        "inviterCount": 0,
+        "friendCount": 0,
+        "attendeeCount": 1
+      },
+      "efcc35d5-4dda-4d9e-be4a-f0a295fda7f2": {
+        "type": "INVITE_ONLY",
+        "category": "PARTY",
+        "chatId": "efcc35d5-4dda-4d9e-be4a-f0a295fda7f2",
+        "endTime": {
+          "iChronology": {
+            "iBase": {
+              "iBase": {
+                "iBase": {
+                  "iMinDaysInFirstWeek": 4
+                }
+              },
+              "iParam": {
+                "iStandardOffset": 19800000,
+                "iWallOffset": 19800000,
+                "iID": "+05:30"
+              }
+            }
+          },
+          "iMillis": 1433776886859
+        },
+        "title": "dolor id elit nostrud proident",
+        "id": "efcc35d5-4dda-4d9e-be4a-f0a295fda7f2",
+        "startTime": {
+          "iChronology": {
+            "iBase": {
+              "iBase": {
+                "iBase": {
+                  "iMinDaysInFirstWeek": 4
+                }
+              }

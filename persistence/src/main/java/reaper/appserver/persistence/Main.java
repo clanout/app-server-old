@@ -1,26 +1,13 @@
 package reaper.appserver.persistence;
 
-import com.fatboyindustrial.gsonjavatime.Converters;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import reaper.appserver.persistence.core.RepositoryFactory;
-import reaper.appserver.persistence.core.postgre.PostgreDataSource;
 import reaper.appserver.persistence.core.postgre.PostgreDatabaseAdapter;
 import reaper.appserver.persistence.model.event.Event;
-import reaper.appserver.persistence.model.event.EventDetails;
 import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
-import reaper.appserver.persistence.model.user.UserDetails;
 import reaper.appserver.persistence.model.user.UserRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 public class Main
 {
@@ -34,157 +21,17 @@ public class Main
 
         User user = userRepository.get("9320369679");
 
-        List<Event> updates = eventRepository.getUpdates(user, "Bengaluru", OffsetDateTime.parse("2015-03-29T21:00:33.51+05:30"));
-        System.out.println(updates.size());
+        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
+        event.setStartTime(OffsetDateTime.now());
+        event.setEndTime(event.getStartTime().plusHours(3));
 
-//        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
-//        System.out.println(Event.Serializer.serialize(event));
-//
-//        OffsetDateTime time = OffsetDateTime.now(ZoneOffset.UTC);
-//        System.out.println(time);
-//
-//        event.setEndTime(time);
-//        eventRepository.update(event, user, "Timestamp test");
-//
-//        event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
-//        System.out.println(Event.Serializer.serialize(event));
-
-//        List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
-//        events.forEach(event -> System.out.println(event.getId()));
-
-//        List<String> contacts = Arrays.asList("+91 (874) 574-3446", "+91 (986) 484-2619", "+91 (809) 567-2567", "+91 (879) 514-2853", "+91 (833) 509-2485");
-//        System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(userRepository.getRegisteredContacts(user, contacts)));
-
-
-//
-//        System.out.println(new Gson().toJson(eventRepository.getDetails("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user)));
-//        System.out.println(new Gson().toJson(eventRepository.get("197c94c9-c4ad-4b73-ae32-1feb3d1a7368", user)));
+        eventRepository.update(event, user, "New Description!!");
 
         postgreDatabaseAdapter.close();
     }
 
-    public static void eventget()
+    public static void create()
     {
-        Gson gson = Converters.registerAll(new GsonBuilder()).setPrettyPrinting().create();
-
-        EventRepository eventRepository = RepositoryFactory.create(Event.class);
-        UserRepository userRepository = RepositoryFactory.create(User.class);
-
-        User user = userRepository.get("9320369679");
-        System.out.println(user);
-
-        //Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
-        //System.out.println(gson.toJson(event));
-
-        List<Event> events = eventRepository.getVisibleEvents(user, "Bangalore");
-        System.out.println(gson.toJson(events));
-
 
     }
-//
-//    public static void createEvent()
-//    {
-//        EventRepository eventRepository = RepositoryFactory.create(Event.class);
-//
-//        Event event = new Event();
-//        event.setOrganizerId("1168614936");
-//        event.setType(Event.Type.PUBLIC);
-//        event.setTitle("Dummy Event");
-//        event.setCategory("General");
-//        event.setStartTime(OffsetDateTime.now());
-//        event.setEndTime(OffsetDateTime.now().plusHours(1));
-//        event.setFinalized(false);
-//
-//        Event.Location location = new Event.Location();
-//        location.setZone("Bangalore");
-//
-//        event.setLocation(location);
-//
-//        event.setChatId("12345");
-//
-//        String eventid = eventRepository.create(event, "Dummy Description");
-//        System.out.println(eventid);
-//    }
-//
-//    public static void loadFriends() throws Exception
-//    {
-//        UserRepository userRepository = RepositoryFactory.create(User.class);
-//
-//        BufferedReader bufferedReader = new BufferedReader(new FileReader("D:/codeX/projects/reaper/test/data/friends.dat"));
-//        String line = "";
-//        while ((line = bufferedReader.readLine()) != null)
-//        {
-//            String tokens[] = line.split(";");
-//
-//            if (!tokens[0].equalsIgnoreCase(tokens[1]))
-//            {
-//                User user = userRepository.get(tokens[0]);
-//
-//                List<String> friends = Arrays.asList(tokens[1]);
-//
-//                userRepository.addFriends(user, friends);
-//            }
-//        }
-//        bufferedReader.close();
-//    }
-//
-//    public static void load() throws Exception
-//    {
-//        UserRepository userRepository = RepositoryFactory.create(User.class);
-//
-//        BufferedReader bufferedReader = new BufferedReader(new FileReader("D:/codeX/projects/reaper/test/data/users.dat"));
-//        String line = "";
-//        while ((line = bufferedReader.readLine()) != null)
-//        {
-//            String tokens[] = line.split(",");
-//
-//            User user = new User();
-//            user.setId(tokens[0]);
-//            user.setUsername(tokens[1]);
-//            user.setPhone(tokens[2]);
-//            user.setFirstname(tokens[3]);
-//            user.setLastname(tokens[4]);
-//            if (tokens[5].equalsIgnoreCase("f"))
-//            {
-//                user.setGender(User.Gender.FEMALE);
-//            }
-//            else
-//            {
-//                user.setGender(User.Gender.MALE);
-//            }
-//            user.setRegistrationTime(OffsetDateTime.parse(tokens[6].replace(" ", "T")));
-//            user.setStatus(User.Status.ACTIVE);
-//
-//            String userId = userRepository.create(user);
-//
-//            System.out.println(userId + "\t" + user);
-//        }
-//        bufferedReader.close();
-//    }
-//
-//    public static void readDetails()
-//    {
-//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//        UserRepository userRepository = RepositoryFactory.create(User.class);
-//
-//        User user = userRepository.get("1168614936");
-//        System.out.println(user);
-//
-//        UserDetails userDetails = userRepository.getUserDetails(user.getId());
-//        System.out.println(gson.toJson(userDetails));
-//    }
-//
-//    public static void addFriends() throws Exception
-//    {
-//        List<String> friends = Arrays.asList("1103675594");//,"1152889224"); //, "1716296053", "1952678247", "1952678247", "2110151006", "2110151006", "2205520504", "2357802924", "2357802924", "2545240997", "2905034189", "2979990076", "3088199575", "3094026607", "3568077948", "3681025577", "4160411515", "4832104744", "5562759834", "5750394386", "5851882983", "6140792440", "6240364405", "6797439046", "6921146402", "7133834467", "7133834467", "7482228748", "8170448043", "8259296468");
-//        Set<String> friend = new HashSet<>();
-//        friend.addAll(friends);
-//
-//
-//        UserRepository userRepository = RepositoryFactory.create(User.class);
-//        User user = userRepository.get("1168614936");
-//        System.out.println(user);
-//
-//        userRepository.block(user, friends);
-//    }
 }

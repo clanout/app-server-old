@@ -584,6 +584,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             EventDetails eventDetails = new EventDetails();
             Set<EventDetails.Attendee> attendees = new HashSet<>();
             Set<EventDetails.Invitee> invitees = new HashSet<>();
+            eventDetails.setId(id);
             eventDetails.setAttendees(attendees);
             eventDetails.setInvitee(invitees);
 
