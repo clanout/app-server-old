@@ -44,7 +44,7 @@ public class EventService
         return eventRepository.getVisibleEvents(user, zone);
     }
 
-    public String create(User user, String title, String typeStr, String category, String startTimeStr, String endTimeStr,
+    public Event create(User user, String title, String typeStr, String category, String startTimeStr, String endTimeStr,
                          String locationLatitude, String locationLongitude, String locationName, String locationZone, String description)
     {
         if (title == null || title.isEmpty())
@@ -145,7 +145,7 @@ public class EventService
 
             eventRepository.setRSVP(event.getId(), user, Event.RSVP.YES);
 
-            return eventId;
+            return event;
         }
         catch (Exception e)
         {

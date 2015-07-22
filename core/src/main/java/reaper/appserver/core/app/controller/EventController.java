@@ -52,10 +52,10 @@ public class EventController extends BaseController
         String locationZone = request.getData("location_zone");
         String description = request.getData("description");
 
-        String eventId = eventService.create(activeUser, title, type, category, startTime, endTime, locationLatitude,
+        Event event = eventService.create(activeUser, title, type, category, startTime, endTime, locationLatitude,
                 locationLongitude, locationName, locationZone, description);
 
-        response.set("event_id", eventId);
+        response.set("event", event);
     }
 
     public void deleteAction()
