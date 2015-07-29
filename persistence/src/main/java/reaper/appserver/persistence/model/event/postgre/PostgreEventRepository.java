@@ -204,6 +204,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             connection.commit();
             connection.close();
 
+            event.setRsvp(Event.RSVP.YES);
+            event.setAttendeeCount(1);
+
             return event.getId();
         }
         catch (SQLException e)
