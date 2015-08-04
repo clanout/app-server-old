@@ -105,6 +105,7 @@ public class MeController extends BaseController
     public void contactsAction()
     {
         List<String> contacts = null;
+        String zone = request.getData("zone");
 
         try
         {
@@ -125,8 +126,15 @@ public class MeController extends BaseController
             throw new BadRequest("Invalid list<contacts> to fetch registered contacts");
         }
 
-        Set<UserDetails.Friend> registeredContacts = userService.getRegisteredContacts(activeUser, contacts);
-
-        response.set("registered_contacts", registeredContacts);
+        if (zone == null)
+        {
+            Set<UserDetails.Friend> registeredContacts = userService.getRegisteredContacts(activeUser, contacts);
+            response.set("registered_contacts", registeredContacts);
+        }
+        else
+        {
+            Set<UserDetails.Friend> registeredContacts = userService.getLocalRegisteredContacts(activeUser, contacts, zone);
+            response.set("registered_contacts", registeredContacts);
+        }
     }
 }

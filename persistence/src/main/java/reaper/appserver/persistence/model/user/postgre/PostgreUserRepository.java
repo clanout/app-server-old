@@ -23,6 +23,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
     private static final String SQL_READ_DETAILS = PostgreQuery.load("user/read_details.sql");
     private static final String SQL_READ_DETAILS_LOCAL = PostgreQuery.load("user/read_details_local.sql");
     private static final String SQL_READ_DETAILS_CONTACTS = PostgreQuery.load("user/read_details_contacts.sql");
+    private static final String SQL_READ_DETAILS_CONTACTS_LOCAL = PostgreQuery.load("user/read_details_contacts_local.sql");
 
     private static final String SQL_CREATE_FRIEND = PostgreQuery.load("user/create_friend.sql");
 
@@ -564,6 +565,57 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
         catch (SQLException e)
         {
             log.error("Unable to get registered contacts [" + e.getMessage() + "]");
+            return null;
+        }
+    }
+
+    @Override
+    public UserDetails getLocalRegisteredContacts(User user, List<String> contacts, String zone)
+    {
+        try
+        {
+            Long userId = null;
+            try
+            {
+                userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            UserDetails userDetails = new UserDetails();
+            userDetails.setId(user.getId());
+            Set<UserDetails.Friend> registeredContacts = new HashSet<>();
+            userDetails.setFriends(registeredContacts);
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_DETAILS_CONTACTS_LOCAL);
+
+            preparedStatement.setArray(1, connection.createArrayOf("text", contacts.toArray()));
+            preparedStatement.setString(2, zone);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                UserDetails.Friend registeredContact = new UserDetails.Friend();
+                registeredContact.setId(resultSet.getString("user_id"));
+                registeredContact.setName(resultSet.getString("name"));
+                registeredContact.setBlocked(false);
+                registeredContact.setFavourite(false);
+
+                registeredContacts.add(registeredContact);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+            return userDetails;
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to get local registered contacts [" + e.getMessage() + "]");
             return null;
         }
     }

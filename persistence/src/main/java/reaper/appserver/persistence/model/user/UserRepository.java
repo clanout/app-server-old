@@ -23,4 +23,6 @@ public interface UserRepository extends Repository<User>
     public void addFriends(User user, List<String> userIds);
 
     public UserDetails getRegisteredContacts(User user, List<String> contacts);
+
+    public UserDetails getLocalRegisteredContacts(User user, List<String> contacts, String zone);
 }

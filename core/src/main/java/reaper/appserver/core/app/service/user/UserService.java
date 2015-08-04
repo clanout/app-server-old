@@ -138,4 +138,17 @@ public class UserService
 
         return registeredContacts;
     }
+
+    public Set<UserDetails.Friend> getLocalRegisteredContacts(User user, List<String> contacts, String zone)
+    {
+        UserDetails userDetails = userRepository.getLocalRegisteredContacts(user, contacts, zone);
+        if (userDetails == null)
+        {
+            throw new ServerError("Unable to fetch local registered contacts for user_id = " + user.getId());
+        }
+
+        Set<UserDetails.Friend> registeredContacts = userDetails.getFriends();
+
+        return registeredContacts;
+    }
 }
