@@ -631,7 +631,15 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_PHONE);
 
             preparedStatement.setString(1, phone);
-            preparedStatement.setString(2, user.getId());
+
+            try
+            {
+                preparedStatement.setLong(2, Long.parseLong(user.getId()));
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
 
             preparedStatement.executeUpdate();
 
