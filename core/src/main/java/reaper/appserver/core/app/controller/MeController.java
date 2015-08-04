@@ -137,4 +137,10 @@ public class MeController extends BaseController
             response.set("registered_contacts", registeredContacts);
         }
     }
+
+    public void phoneAction()
+    {
+        String phone = request.getData("phone");
+        userService.setPhone(activeUser, phone);
+    }
 }

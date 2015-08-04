@@ -34,6 +34,8 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
     private static final String SQL_UPDATE_BLOCK = PostgreQuery.load("user/update_block.sql");
     private static final String SQL_UPDATE_UNBLOCK = PostgreQuery.load("user/update_unblock.sql");
 
+    private static final String SQL_UPDATE_PHONE = PostgreQuery.load("user/update_phone.sql");
+
     public PostgreUserRepository()
     {
         super(new PostgreUserMapper());
@@ -617,6 +619,28 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
         {
             log.error("Unable to get local registered contacts [" + e.getMessage() + "]");
             return null;
+        }
+    }
+
+    @Override
+    public void setPhone(User user, String phone)
+    {
+        try
+        {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_PHONE);
+
+            preparedStatement.setString(1, phone);
+            preparedStatement.setString(2, user.getId());
+
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to update phone for user with user_id = " + user.getId() + "; [" + e.getMessage() + "]");
         }
     }
 }

@@ -151,4 +151,14 @@ public class UserService
 
         return registeredContacts;
     }
+
+    public void setPhone(User user, String phone)
+    {
+        if (phone == null || phone.isEmpty())
+        {
+            throw new BadRequest("phone number cannot be null");
+        }
+
+        userRepository.setPhone(user, phone);
+    }
 }

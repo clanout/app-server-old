@@ -25,4 +25,6 @@ public interface UserRepository extends Repository<User>
     public UserDetails getRegisteredContacts(User user, List<String> contacts);
 
     public UserDetails getLocalRegisteredContacts(User user, List<String> contacts, String zone);
+
+    public void setPhone(User user, String phone);
 }
