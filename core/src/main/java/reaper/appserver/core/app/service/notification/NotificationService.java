@@ -13,9 +13,12 @@ import reaper.appserver.core.app.service.notification.api.request.NotificationRe
 import reaper.appserver.core.app.service.notification.api.response.NotificationPullResponse;
 import reaper.appserver.core.app.service.user.UserService;
 import reaper.appserver.log.LogUtil;
+import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.model.event.Event;
+import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
 import reaper.appserver.persistence.model.user.UserDetails;
+import reaper.appserver.persistence.model.user.UserRepository;
 import retrofit.client.Response;
 
 import java.util.HashSet;
@@ -34,14 +37,14 @@ public class NotificationService
     }
 
     private NotificationApi api;
-    private UserService userService;
-    private EventService eventService;
+    private UserRepository userRepository;
+    private EventRepository eventRepository;
 
     public NotificationService()
     {
         api = ApiManager.getApi();
-        userService = new UserService();
-        eventService = new EventService();
+        userRepository = RepositoryFactory.create(User.class);
+        eventRepository = RepositoryFactory.create(Event.class);
     }
 
     public void register(String userId, String token)
@@ -68,7 +71,7 @@ public class NotificationService
                 .addParameter("event_id", event.getId())
                 .build();
 
-        Set<UserDetails.Friend> friends = userService.getFriends(user);
+        Set<UserDetails.Friend> friends = userRepository.getUserDetails(user.getId()).getFriends();
         Set<String> userIds = new HashSet<>(friends.size());
         for (UserDetails.Friend friend : friends)
         {

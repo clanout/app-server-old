@@ -18,16 +18,18 @@ public class ApiManager
     static
     {
         gson = Converters.registerAll(new GsonBuilder()).create();
-
-        restAdapter = new RestAdapter.Builder()
-                .setClient(new OkClient(new OkHttpClient()))
-                .setEndpoint(ConfLoader.getConf(ConfResource.NOTIFICATION).get("notification.server.endpoint"))
-                .setConverter(new GsonConverter(gson))
-                .build();
     }
 
     public static NotificationApi getApi()
     {
+        if(restAdapter == null)
+        {
+            restAdapter = new RestAdapter.Builder()
+                    .setClient(new OkClient(new OkHttpClient()))
+                    .setEndpoint(ConfLoader.getConf(ConfResource.NOTIFICATION).get("notification.server.endpoint"))
+                    .setConverter(new GsonConverter(gson))
+                    .build();
+        }
         return restAdapter.create(NotificationApi.class);
     }
 }

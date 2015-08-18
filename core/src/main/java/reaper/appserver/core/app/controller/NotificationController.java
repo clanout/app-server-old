@@ -24,7 +24,7 @@ public class NotificationController extends BaseController
 
         if(token == null || token.isEmpty())
         {
-            throw new NullPointerException();
+            throw new BadRequest("token cannot be null");
         }
 
         notificationService.register(activeUser.getId(), token);
