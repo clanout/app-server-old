@@ -1,6 +1,8 @@
 package reaper.appserver.core.app.service.event;
 
 import reaper.appserver.core.app.service.chat.ChatService;
+import reaper.appserver.core.app.service.notification.Notification;
+import reaper.appserver.core.app.service.notification.NotificationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
 import reaper.appserver.persistence.core.RepositoryFactory;
@@ -17,11 +19,13 @@ public class EventService
 {
     private EventRepository eventRepository;
     private ChatService chatService;
+    private NotificationService notificationService;
 
     public EventService()
     {
         eventRepository = RepositoryFactory.create(Event.class);
         chatService = new ChatService();
+        notificationService = new NotificationService();
     }
 
     public Event getEvent(User user, String eventId)
@@ -144,6 +148,8 @@ public class EventService
             }
 
             eventRepository.setRSVP(event.getId(), user, Event.RSVP.YES);
+
+            notificationService.eventCreated(user, event);
 
             return event;
         }
