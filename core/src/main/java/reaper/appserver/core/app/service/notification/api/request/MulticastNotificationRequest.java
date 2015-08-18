@@ -1,12 +1,11 @@
-package reaper.appserver.core.app.service.notification.api;
+package reaper.appserver.core.app.service.notification.api.request;
 
 import com.google.gson.annotations.SerializedName;
 import reaper.appserver.core.app.service.notification.Notification;
 
-import java.util.List;
 import java.util.Set;
 
-public class MulticastNotification
+public class MulticastNotificationRequest
 {
     @SerializedName("to")
     private Set<String> userIds;
@@ -14,7 +13,7 @@ public class MulticastNotification
     @SerializedName("data")
     private Notification notification;
 
-    public MulticastNotification(Set<String> userIds, Notification notification)
+    public MulticastNotificationRequest(Set<String> userIds, Notification notification)
     {
         this.userIds = userIds;
         this.notification = notification;
