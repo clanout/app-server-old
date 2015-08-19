@@ -11,11 +11,11 @@ public class Notification
 
     public enum Type
     {
-        EVENT_ADD,
-        EVENT_REMOVE,
-        FRIEND_ADD,
-        FRIEND_REMOVE,
-        EVENT_UPDATED
+        EVENT_ADDED,
+        EVENT_REMOVED,
+        EVENT_UPDATED,
+        EVENT_INVITATION,
+        FRIEND_RELOCATED
     }
 
     private Notification(Type type)

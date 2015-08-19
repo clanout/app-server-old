@@ -27,4 +27,6 @@ public interface UserRepository extends Repository<User>
     public UserDetails getLocalRegisteredContacts(User user, List<String> contacts, String zone);
 
     public void setPhone(User user, String phone);
+
+    public boolean updateLocation(User user, String zone);
 }

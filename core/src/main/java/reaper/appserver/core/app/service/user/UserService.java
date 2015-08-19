@@ -1,5 +1,6 @@
 package reaper.appserver.core.app.service.user;
 
+import reaper.appserver.core.app.service.notification.NotificationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
 import reaper.appserver.persistence.core.RepositoryFactory;
@@ -16,32 +17,34 @@ import java.util.Set;
 public class UserService
 {
     private UserRepository userRepository;
+    private NotificationService notificationService;
 
     public UserService()
     {
         userRepository = RepositoryFactory.create(User.class);
+        notificationService = new NotificationService();
     }
 
     public void create(String userId, String username, String firstname, String lastname, String gender)
     {
         if (userId == null || userId.isEmpty())
         {
-            throw new BadRequest("creare User : userId cannot be null/empty");
+            throw new BadRequest("create User : userId cannot be null/empty");
         }
 
         if (username == null || username.isEmpty())
         {
-            throw new BadRequest("creare User : username cannot be null/empty");
+            throw new BadRequest("create User : username cannot be null/empty");
         }
 
         if (firstname == null || firstname.isEmpty())
         {
-            throw new BadRequest("creare User : firstname cannot be null/empty");
+            throw new BadRequest("create User : firstname cannot be null/empty");
         }
 
         if (lastname == null || lastname.isEmpty())
         {
-            throw new BadRequest("creare User : lastname cannot be null/empty");
+            throw new BadRequest("create User : lastname cannot be null/empty");
         }
 
         User.Gender userGender = null;
@@ -156,9 +159,22 @@ public class UserService
     {
         if (phone == null || phone.isEmpty())
         {
-            throw new BadRequest("phone number cannot be null");
+            throw new BadRequest("phone number cannot be null/empty");
         }
 
         userRepository.setPhone(user, phone);
+    }
+
+    public void setLocation(User user, String zone)
+    {
+        if (zone == null || zone.isEmpty())
+        {
+            throw new BadRequest("user location cannot be null/empty");
+        }
+
+        if (userRepository.updateLocation(user, zone))
+        {
+            notificationService.userRelocated(user, zone);
+        }
     }
 }

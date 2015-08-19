@@ -143,4 +143,10 @@ public class MeController extends BaseController
         String phone = request.getData("phone");
         userService.setPhone(activeUser, phone);
     }
+
+    public void locationAction()
+    {
+        String zone = request.getData("zone");
+        userService.setLocation(activeUser, zone);
+    }
 }

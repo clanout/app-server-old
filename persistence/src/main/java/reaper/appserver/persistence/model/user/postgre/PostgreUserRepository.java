@@ -36,6 +36,9 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
 
     private static final String SQL_UPDATE_PHONE = PostgreQuery.load("user/update_phone.sql");
 
+    private static final String SQL_READ_LOCATION = PostgreQuery.load("user/read_location.sql");
+    private static final String SQL_UPDATE_LOCATION = PostgreQuery.load("user/update_location.sql");
+
     public PostgreUserRepository()
     {
         super(new PostgreUserMapper());
@@ -649,6 +652,63 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
         catch (SQLException e)
         {
             log.error("Unable to update phone for user with user_id = " + user.getId() + "; [" + e.getMessage() + "]");
+        }
+    }
+
+    @Override
+    public boolean updateLocation(User user, String zone)
+    {
+        try
+        {
+            boolean result = false;
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_LOCATION);
+
+            try
+            {
+                preparedStatement.setLong(1, Long.parseLong(user.getId()));
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                if(!resultSet.getString("location").equalsIgnoreCase(zone))
+                {
+                    result = true;
+                    break;
+                }
+            }
+            resultSet.close();
+            preparedStatement.close();
+
+            preparedStatement = connection.prepareStatement(SQL_UPDATE_LOCATION);
+            preparedStatement.setString(1, zone);
+
+            try
+            {
+                preparedStatement.setLong(2, Long.parseLong(user.getId()));
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            connection.close();
+
+            return result;
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to update location for user with user_id = " + user.getId() + "; [" + e.getMessage() + "]");
+            return false;
         }
     }
 }

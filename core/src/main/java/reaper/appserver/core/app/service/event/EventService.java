@@ -1,7 +1,6 @@
 package reaper.appserver.core.app.service.event;
 
 import reaper.appserver.core.app.service.chat.ChatService;
-import reaper.appserver.core.app.service.notification.Notification;
 import reaper.appserver.core.app.service.notification.NotificationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
@@ -173,6 +172,8 @@ public class EventService
         }
 
         eventRepository.remove(event, user);
+
+        notificationService.eventDeleted(user, event);
     }
 
     public EventDetails getDetails(String eventId, User user)
@@ -206,6 +207,9 @@ public class EventService
         }
 
         eventRepository.setRSVP(eventId, user, rsvp);
+
+        Event event = eventRepository.get(eventId, user);
+        notificationService.rsvpChanged(user, event, rsvp);
     }
 
     public void invite(String eventId, User user, List<String> invitedUsers)
@@ -216,6 +220,9 @@ public class EventService
         }
 
         eventRepository.createInvitation(eventId, user, invitedUsers);
+
+        Event event = eventRepository.get(eventId, user);
+        notificationService.eventInvitation(user, invitedUsers, event);
     }
 
     public Event update(String eventId, User user, String isFinalizedStr, String startTimeStr, String endTimeStr,
@@ -299,7 +306,9 @@ public class EventService
                 chatService.postMessages(event.getChatId(), chatUpdate);
             }
 
-            return eventRepository.get(eventId, user);
+            event = eventRepository.get(eventId, user);
+            notificationService.eventUpdated(user, event);
+            return event;
         }
         catch (Exception e)
         {
