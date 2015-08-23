@@ -48,7 +48,7 @@ public class EventService
     }
 
     public Event create(User user, String title, String typeStr, String category, String startTimeStr, String endTimeStr,
-                         String locationLatitude, String locationLongitude, String locationName, String locationZone, String description)
+                        String locationLatitude, String locationLongitude, String locationName, String locationZone, String description)
     {
         if (title == null || title.isEmpty())
         {
@@ -335,4 +335,70 @@ public class EventService
 
         return eventRepository.getUpdates(user, zone, lastUpdated);
     }
+
+    public List<Event> extractNewEventList(List<Event> allEvents, List<String> eventIds)
+    {
+        List<Event> newEvents = new ArrayList<>();
+        int index = 0;
+        while (index < allEvents.size())
+        {
+            Event event = allEvents.get(index);
+            if(!eventIds.contains(event.getId()))
+            {
+                newEvents.add(event);
+                allEvents.remove(index);
+            }
+            else
+            {
+                index++;
+            }
+        }
+        return newEvents;
+    }
+
+    public List<Event> extractUpdatedEventList(List<Event> allEvents, String lastUpdatedStr)
+    {
+        OffsetDateTime lastUpdated = null;
+        try
+        {
+            lastUpdated = OffsetDateTime.parse(lastUpdatedStr);
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("Invalid last_updated timestamp");
+        }
+
+
+        List<Event> updatedEvents = new ArrayList<>();
+        for(Event event : allEvents)
+        {
+            if(event.getUpdateTime().isAfter(lastUpdated))
+            {
+                updatedEvents.add(event);
+            }
+        }
+        return updatedEvents;
+    }
+
+    public List<String> extractDeletedEventList(List<Event> allEvents, List<String> eventIds)
+    {
+        List<String> allEventIds = new ArrayList<>(allEvents.size());
+        List<String> deletedEvents = new ArrayList<>();
+
+        for(Event event: allEvents)
+        {
+            allEventIds.add(event.getId());
+        }
+
+        for(String eventId:eventIds)
+        {
+            if(!allEventIds.contains(eventId))
+            {
+                deletedEvents.add(eventId);
+            }
+        }
+
+        return deletedEvents;
+    }
+
 }

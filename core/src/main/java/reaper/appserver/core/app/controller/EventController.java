@@ -144,9 +144,34 @@ public class EventController extends BaseController
     {
         String zone = request.getData("zone");
         String lastUpdatedStr = request.getData("last_updated");
+        List<String> eventIds = null;
 
-        List<Event> events = eventService.getUpdates(activeUser, zone, lastUpdatedStr);
+        try
+        {
+            String eventIdsJson = request.getData("event_list");
+            Type type = new TypeToken<List<String>>()
+            {
+            }.getType();
 
-        response.set("event_updates", events);
+            eventIds = (new Gson()).fromJson(eventIdsJson, type);
+            if (eventIds == null)
+            {
+                throw new NullPointerException();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("Invalid list<event_id> for fetching updates");
+        }
+
+        List<Event> allEvents = eventService.getEvents(activeUser, zone);
+
+        List<Event> newEvents = eventService.extractNewEventList(allEvents, eventIds);
+        List<Event> updatedEvents = eventService.extractUpdatedEventList(allEvents, lastUpdatedStr);
+        List<String> deletedEvents = eventService.extractDeletedEventList(allEvents, eventIds);
+
+        response.set("new_events", newEvents);
+        response.set("updated_events", updatedEvents);
+        response.set("deleted_events", deletedEvents);
     }
 }
