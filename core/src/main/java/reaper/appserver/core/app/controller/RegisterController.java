@@ -11,6 +11,11 @@ public class RegisterController extends BaseController
         super(request, responseFactory);
     }
 
+    @Override
+    protected void preProcess()
+    {
+    }
+
     public void mainAction()
     {
         String userId = request.getData("id");
