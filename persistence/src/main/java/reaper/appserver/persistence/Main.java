@@ -1,5 +1,8 @@
 package reaper.appserver.persistence;
 
+import com.fatboyindustrial.gsonjavatime.Converters;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.core.postgre.PostgreDatabaseAdapter;
 import reaper.appserver.persistence.model.event.Event;
@@ -8,24 +11,24 @@ import reaper.appserver.persistence.model.user.User;
 import reaper.appserver.persistence.model.user.UserRepository;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public class Main
 {
     public static void main(String[] args) throws Exception
     {
+        Gson gson = Converters.registerAll(new GsonBuilder()).setPrettyPrinting().create();
+
         PostgreDatabaseAdapter postgreDatabaseAdapter = new PostgreDatabaseAdapter();
         postgreDatabaseAdapter.init();
 
         UserRepository userRepository = RepositoryFactory.create(User.class);
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
-        User user = userRepository.get("9320369679");
+        User user = userRepository.get("977526725631911");
+        List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
 
-        Event event = eventRepository.get("efcc35d5-4dda-4d9e-be4a-f0a295fda7f2", user);
-        event.setStartTime(OffsetDateTime.now());
-        event.setEndTime(event.getStartTime().plusHours(3));
-
-        eventRepository.update(event, user, "New Description!!");
+        System.out.println();
 
         postgreDatabaseAdapter.close();
     }

@@ -91,15 +91,17 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             Connection connection = getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE);
 
+            long userId;
             try
             {
-                preparedStatement.setLong(1, Long.parseLong(user.getId()));
+                userId = Long.parseLong(user.getId());;
             }
             catch (Exception e)
             {
                 throw new SQLException("Invalid user_id");
             }
 
+            preparedStatement.setLong(1, userId);
             preparedStatement.setString(2, user.getUsername());
             preparedStatement.setString(3, user.getPhone());
             preparedStatement.setString(4, user.getFirstname());
@@ -662,17 +664,20 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
         {
             boolean result = false;
 
-            Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_LOCATION);
-
+            long userId;
             try
             {
-                preparedStatement.setLong(1, Long.parseLong(user.getId()));
+                userId = Long.parseLong(user.getId());
             }
             catch (Exception e)
             {
                 throw new SQLException("Invalid user_id");
             }
+
+            Connection connection = getConnection();
+
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_LOCATION);
+            preparedStatement.setLong(1, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
@@ -687,19 +692,11 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             preparedStatement.close();
 
             preparedStatement = connection.prepareStatement(SQL_UPDATE_LOCATION);
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, userId);
             preparedStatement.setString(1, zone);
 
-            try
-            {
-                preparedStatement.setLong(2, Long.parseLong(user.getId()));
-            }
-            catch (Exception e)
-            {
-                throw new SQLException("Invalid user_id");
-            }
-
             preparedStatement.executeUpdate();
-
             preparedStatement.close();
             connection.close();
 
