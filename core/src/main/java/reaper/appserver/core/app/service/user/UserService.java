@@ -177,4 +177,9 @@ public class UserService
             notificationService.userRelocated(user, zone);
         }
     }
+
+    public void addFriends(User user, List<String> userIds)
+    {
+        userRepository.addFriends(user, userIds);
+    }
 }

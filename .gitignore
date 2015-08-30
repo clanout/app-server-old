@@ -22,3 +22,4 @@ target/
 
 ## App Manager
 /.manager/
+.DS_Store

@@ -149,4 +149,30 @@ public class MeController extends BaseController
         String zone = request.getData("zone");
         userService.setLocation(activeUser, zone);
     }
+
+    public void addFriendsAction()
+    {
+        List<String> userIds = null;
+
+        try
+        {
+            String userIdJson = request.getData("friend_list");
+            Type type = new TypeToken<List<String>>()
+            {
+            }.getType();
+
+            userIds = (new Gson()).fromJson(userIdJson, type);
+
+            if (userIds == null)
+            {
+                throw new NullPointerException();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("Invalid list<friend_id> to fetch add friends");
+        }
+
+        userService.addFriends(activeUser, userIds);
+    }
 }
