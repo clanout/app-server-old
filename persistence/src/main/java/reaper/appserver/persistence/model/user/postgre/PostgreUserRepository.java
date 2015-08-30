@@ -694,7 +694,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             preparedStatement = connection.prepareStatement(SQL_UPDATE_LOCATION);
             preparedStatement.setLong(1, userId);
             preparedStatement.setLong(2, userId);
-            preparedStatement.setString(1, zone);
+            preparedStatement.setString(3, zone);
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
