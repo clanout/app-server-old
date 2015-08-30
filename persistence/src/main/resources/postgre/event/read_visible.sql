@@ -49,7 +49,7 @@ FROM
     GROUP BY event_id
   ) c
     ON visible.event_id = c.event_id
-  INNER JOIN
+  LEFT JOIN
   (
     SELECT *
     FROM event_attendees
