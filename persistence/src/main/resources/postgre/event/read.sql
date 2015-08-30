@@ -39,7 +39,7 @@ FROM
     LIMIT 1
   ) c
     ON a.event_id = c.event_id
-  INNER JOIN
+  LEFT JOIN
   (
     SELECT *
     FROM event_attendees
