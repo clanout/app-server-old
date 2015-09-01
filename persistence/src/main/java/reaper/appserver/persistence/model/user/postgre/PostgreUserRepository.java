@@ -25,6 +25,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
     private static final String SQL_READ_DETAILS_CONTACTS = PostgreQuery.load("user/read_details_contacts.sql");
     private static final String SQL_READ_DETAILS_CONTACTS_LOCAL = PostgreQuery.load("user/read_details_contacts_local.sql");
 
+    private static final String SQL_READ_FRIENDS = PostgreQuery.load("user/read_friends.sql");
     private static final String SQL_CREATE_FRIEND = PostgreQuery.load("user/create_friend.sql");
 
     private static final String SQL_CREATE_FAVOURITE = PostgreQuery.load("user/create_favourite.sql");
@@ -427,6 +428,8 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             }
 
             Connection connection = getConnection();
+            connection.setAutoCommit(false);
+
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE_FAVOURITE);
 
             for (Long friendId : friendIds)
@@ -437,6 +440,8 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             }
 
             preparedStatement.executeBatch();
+
+            connection.commit();
 
             preparedStatement.close();
             connection.close();
@@ -480,7 +485,6 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
             log.error("Unable to remove favourites for user with user_id = " + user.getId() + " [" + e.getMessage() + "]");
         }
     }
@@ -491,23 +495,47 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
         try
         {
             Long userId = null;
-            List<Long> friendIds = new ArrayList<>();
+            List<String> friends = new ArrayList<>();
             try
             {
                 userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            Connection connection = getConnection();
+            connection.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_FRIENDS);
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                friends.add(resultSet.getString("friend_id"));
+            }
+            resultSet.close();
+            preparedStatement.close();
+
+            List<Long> friendIds = new ArrayList<>();
+            try
+            {
                 for (String friendId : userIds)
                 {
-                    friendIds.add(Long.parseLong(friendId));
+                    if(!friends.contains(friendId))
+                    {
+                        friendIds.add(Long.parseLong(friendId));
+                    }
                 }
             }
             catch (Exception e)
             {
-                throw new SQLException("Invalid user_id/friend_ids");
+                throw new SQLException("Invalid friend_ids");
             }
 
-            Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE_FRIEND);
-
+            preparedStatement = connection.prepareStatement(SQL_CREATE_FRIEND);
             for (Long friendId : friendIds)
             {
                 preparedStatement.setLong(1, userId);
@@ -516,6 +544,8 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             }
 
             preparedStatement.executeBatch();
+
+            connection.commit();
 
             preparedStatement.close();
             connection.close();

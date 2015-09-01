@@ -8,10 +8,13 @@ import reaper.appserver.persistence.core.postgre.PostgreDatabaseAdapter;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
+import reaper.appserver.persistence.model.user.UserDetails;
 import reaper.appserver.persistence.model.user.UserRepository;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class Main
 {
@@ -26,12 +29,20 @@ public class Main
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
         User user = userRepository.get("977526725631911");
-        List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
+        userRepository.addFriends(user, Arrays.asList("976303355745864"));
+        Set<UserDetails.Friend> friends = userRepository.getUserDetails(user.getId()).getFriends();
 
-        for(Event event : events)
+        for (UserDetails.Friend friend : friends)
         {
-            System.out.println(event.getTitle() + " : " + event.getOrganizerId());
+            System.out.println(friend.getId() + " : " + friend.getName());
         }
+
+//        List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
+//
+//        for(Event event : events)
+//        {
+//            System.out.println(event.getTitle() + " : " + event.getOrganizerId());
+//        }
 
         postgreDatabaseAdapter.close();
     }

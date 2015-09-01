@@ -241,6 +241,8 @@ public class EventService
             throw new BadRequest("Cannot get event from event_id  = " + eventId);
         }
 
+        boolean isAlreadyFinalized = event.isFinalized();
+
         try
         {
             if (isFinalizedStr != null)
@@ -260,6 +262,11 @@ public class EventService
 
             if (startTimeStr != null && endTimeStr != null)
             {
+                if(isAlreadyFinalized)
+                {
+                    throw new BadRequest("Cannot reschedule a finalized event");
+                }
+
                 try
                 {
                     OffsetDateTime startTime = OffsetDateTime.parse(startTimeStr);
@@ -278,6 +285,11 @@ public class EventService
 
             if (locationZone != null)
             {
+                if(isAlreadyFinalized)
+                {
+                    throw new BadRequest("Cannot chage the location for a finalized event");
+                }
+
                 Event.Location location = new Event.Location();
                 location.setName(locationName);
                 location.setZone(locationZone);
