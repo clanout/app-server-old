@@ -316,26 +316,6 @@ public class EventService
         }
     }
 
-    public List<Event> getUpdates(User user, String zone, String lastUpdatedStr)
-    {
-        OffsetDateTime lastUpdated = null;
-        try
-        {
-            lastUpdated = OffsetDateTime.parse(lastUpdatedStr);
-        }
-        catch (Exception e)
-        {
-            throw new BadRequest("Invalid last_updated timestamp");
-        }
-
-        if (zone == null || zone.isEmpty())
-        {
-            throw new BadRequest("Zone not specified while fetching visible events");
-        }
-
-        return eventRepository.getUpdates(user, zone, lastUpdated);
-    }
-
     public List<Event> extractNewEventList(List<Event> allEvents, List<String> eventIds)
     {
         List<Event> newEvents = new ArrayList<>();

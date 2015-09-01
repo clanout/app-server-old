@@ -25,10 +25,13 @@ public class Main
         UserRepository userRepository = RepositoryFactory.create(User.class);
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
-        User user = userRepository.get("976303355745864");
+        User user = userRepository.get("977526725631911");
         List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
 
-        System.out.println(gson.toJson(events));
+        for(Event event : events)
+        {
+            System.out.println(event.getTitle() + " : " + event.getOrganizerId());
+        }
 
         postgreDatabaseAdapter.close();
     }

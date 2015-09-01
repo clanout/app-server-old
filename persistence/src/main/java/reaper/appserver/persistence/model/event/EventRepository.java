@@ -18,8 +18,6 @@ public interface EventRepository extends Repository<Event>
 
     public List<Event> getVisibleEvents(User user, String zone);
 
-    public List<Event> getUpdates(User user, String zone, OffsetDateTime lastUpdated);
-
     public void setRSVP(String id, User user, Event.RSVP rsvp);
 
     public void createInvitation(String id, User from, List<String> to);

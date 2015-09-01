@@ -38,7 +38,14 @@ FROM
     FROM event_invitees
     WHERE event_invitees.invitee_id = ?
   ) visible
-  INNER JOIN event_info a ON visible.event_id = a.event_id
+  INNER JOIN
+  (
+    SELECT *
+    FROM event_info
+    WHERE type <> 1
+          OR organizer_id = ?
+  ) a
+    ON visible.event_id = a.event_id
   INNER JOIN event_location b ON visible.event_id = b.event_id AND b.city_cell = ?
   INNER JOIN
   (
