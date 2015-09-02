@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 public class PostgreEventMapper implements PostgreEntityMapper<Event>
 {
@@ -16,17 +17,15 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
     {
         Event event = new Event();
 
-        // title | type | category | start_timestamp | end_timestamp | 
-        // organizer_id xmpp_group_id | finalized | event_id | coordinates | name | city_cell |
-        // event_id | description | friendsattending | attendeecount | invitercount        
         event.setId(resultSet.getString("event_id"));
         event.setTitle(resultSet.getString("title"));
         event.setType(Event.Type.fromCode(resultSet.getInt("type")));
         event.setCategory(resultSet.getString("category"));
+
         try
         {
             Timestamp timestamp = resultSet.getTimestamp("start_timestamp");
-            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
             event.setStartTime(time);
         }
         catch (Exception e)
@@ -37,16 +36,16 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         try
         {
             Timestamp timestamp = resultSet.getTimestamp("end_timestamp");
-            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
             event.setEndTime(time);
         }
         catch (Exception e)
         {
             throw new SQLException("Unable to process end_timestamp (timestamp)");
         }
+
         event.setOrganizerId(resultSet.getString("organizer_id"));
-        event.setChatId(resultSet.getString("xmpp_group_id"));
-        event.setFinalized(resultSet.getBoolean("finalized"));
+        event.setIsFinalized(resultSet.getBoolean("finalized"));
 
         Event.Location location = new Event.Location();
         location.setLongitude(resultSet.getDouble("longitude"));
@@ -71,12 +70,23 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         try
         {
             Timestamp timestamp = resultSet.getTimestamp("update_time");
-            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
             event.setUpdateTime(time);
         }
         catch (Exception e)
         {
             throw new SQLException("Unable to process update_time (timestamp)");
+        }
+
+        try
+        {
+            Timestamp timestamp = resultSet.getTimestamp("create_time");
+            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
+            event.setCreateTime(time);
+        }
+        catch (Exception e)
+        {
+            throw new SQLException("Unable to process create_time (timestamp)");
         }
 
         return event;

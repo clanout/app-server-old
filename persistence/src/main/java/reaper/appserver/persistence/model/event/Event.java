@@ -1,6 +1,5 @@
 package reaper.appserver.persistence.model.event;
 
-import com.fatboyindustrial.gsonjavatime.Converters;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -14,156 +13,21 @@ import java.util.List;
 
 public class Event implements Entity
 {
-    public static enum Type
-    {
-        PUBLIC(0),
-        INVITE_ONLY(1);
-
-        private int code;
-
-        private Type(int code)
-        {
-            this.code = code;
-        }
-
-        public int getCode()
-        {
-            return code;
-        }
-
-        public static Type fromCode(int code)
-        {
-            if (code == 0)
-            {
-                return PUBLIC;
-            }
-            else
-            {
-                return INVITE_ONLY;
-            }
-        }
-    }
-
-    public static enum RSVP
-    {
-        YES,
-        MAYBE,
-        NO
-    }
-
-    public static class Location
-    {
-        private Double longitude;
-        private Double latitude;
-        private String name;
-        private String zone;
-
-        public Double getLongitude()
-        {
-            return longitude;
-        }
-
-        public void setLongitude(double longitude)
-        {
-            this.longitude = longitude;
-        }
-
-        public Double getLatitude()
-        {
-            return latitude;
-        }
-
-        public void setLatitude(double latitude)
-        {
-            this.latitude = latitude;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public void setName(String name)
-        {
-            this.name = name;
-        }
-
-        public String getZone()
-        {
-            return zone;
-        }
-
-        public void setZone(String zone)
-        {
-            this.zone = zone;
-        }
-
-        @Override
-        public String toString()
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("[");
-            stringBuilder.append(name);
-            stringBuilder.append(" : ");
-            stringBuilder.append(zone);
-            stringBuilder.append("]");
-            return stringBuilder.toString();
-        }
-    }
-
-    public static class Serializer
-    {
-        private static Gson gson;
-
-        static
-        {
-            GsonBuilder gsonBuilder = GsonProvider.getGsonBuilder()
-                    .serializeNulls()
-                    .addSerializationExclusionStrategy(new SerializerStrategy());
-            gson = gsonBuilder.create();
-        }
-
-        private static class SerializerStrategy implements ExclusionStrategy
-        {
-            private static List<String> excluded = Arrays.asList("rsvp", "friendCount", "inviterCount");
-
-            @Override
-            public boolean shouldSkipField(FieldAttributes fieldAttributes)
-            {
-                if (excluded.contains(fieldAttributes.getName()))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> aClass)
-            {
-                return false;
-            }
-        }
-
-        public static String serialize(Event event)
-        {
-            return gson.toJson(event);
-        }
-    }
-
     private String id;
+    private String organizerId;
     private String title;
     private Type type;
     private String category;
+    private String chatId;
+
     private boolean isFinalized;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
-    private String organizerId;
     private Location location;
+
     private int attendeeCount;
-    private String chatId;
+
+    private OffsetDateTime createTime;
     private OffsetDateTime updateTime;
 
     private RSVP rsvp;
@@ -179,6 +43,17 @@ public class Event implements Entity
     public void setId(String id)
     {
         this.id = id;
+        this.chatId = id;
+    }
+
+    public String getOrganizerId()
+    {
+        return organizerId;
+    }
+
+    public void setOrganizerId(String organizerId)
+    {
+        this.organizerId = organizerId;
     }
 
     public String getTitle()
@@ -216,7 +91,7 @@ public class Event implements Entity
         return isFinalized;
     }
 
-    public void setFinalized(boolean isFinalized)
+    public void setIsFinalized(boolean isFinalized)
     {
         this.isFinalized = isFinalized;
     }
@@ -239,16 +114,6 @@ public class Event implements Entity
     public void setEndTime(OffsetDateTime endTime)
     {
         this.endTime = endTime;
-    }
-
-    public String getOrganizerId()
-    {
-        return organizerId;
-    }
-
-    public void setOrganizerId(String organizerId)
-    {
-        this.organizerId = organizerId;
     }
 
     public Location getLocation()
@@ -276,9 +141,14 @@ public class Event implements Entity
         return chatId;
     }
 
-    public void setChatId(String chatId)
+    public OffsetDateTime getCreateTime()
     {
-        this.chatId = chatId;
+        return createTime;
+    }
+
+    public void setCreateTime(OffsetDateTime createTime)
+    {
+        this.createTime = createTime;
     }
 
     public OffsetDateTime getUpdateTime()
@@ -370,6 +240,145 @@ public class Event implements Entity
             {
                 return false;
             }
+        }
+    }
+
+    public enum Type
+    {
+        PUBLIC(0),
+        INVITE_ONLY(1);
+
+        private int code;
+
+        private Type(int code)
+        {
+            this.code = code;
+        }
+
+        public int getCode()
+        {
+            return code;
+        }
+
+        public static Type fromCode(int code)
+        {
+            if (code == 0)
+            {
+                return PUBLIC;
+            }
+            else
+            {
+                return INVITE_ONLY;
+            }
+        }
+    }
+
+    public enum RSVP
+    {
+        YES,
+        MAYBE,
+        NO
+    }
+
+    public static class Location
+    {
+        private Double longitude;
+        private Double latitude;
+        private String name;
+        private String zone;
+
+        public Double getLongitude()
+        {
+            return longitude;
+        }
+
+        public void setLongitude(double longitude)
+        {
+            this.longitude = longitude;
+        }
+
+        public Double getLatitude()
+        {
+            return latitude;
+        }
+
+        public void setLatitude(double latitude)
+        {
+            this.latitude = latitude;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+
+        public String getZone()
+        {
+            return zone;
+        }
+
+        public void setZone(String zone)
+        {
+            this.zone = zone;
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("[");
+            stringBuilder.append(name);
+            stringBuilder.append(" : ");
+            stringBuilder.append(zone);
+            stringBuilder.append("]");
+            return stringBuilder.toString();
+        }
+    }
+
+    public static class Serializer
+    {
+        private static Gson gson;
+
+        static
+        {
+            GsonBuilder gsonBuilder = GsonProvider.getGsonBuilder()
+                    .serializeNulls()
+                    .addSerializationExclusionStrategy(new SerializerStrategy());
+            gson = gsonBuilder.create();
+        }
+
+        private static class SerializerStrategy implements ExclusionStrategy
+        {
+            private static List<String> excluded = Arrays.asList("rsvp", "friendCount", "inviterCount", "updateTime");
+
+            @Override
+            public boolean shouldSkipField(FieldAttributes fieldAttributes)
+            {
+                if (excluded.contains(fieldAttributes.getName()))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> aClass)
+            {
+                return false;
+            }
+        }
+
+        public static String serialize(Event event)
+        {
+            return gson.toJson(event);
         }
     }
 }

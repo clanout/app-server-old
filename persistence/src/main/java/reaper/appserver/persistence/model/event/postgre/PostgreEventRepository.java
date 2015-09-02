@@ -11,7 +11,9 @@ import reaper.appserver.persistence.model.event.EventUpdate;
 import reaper.appserver.persistence.model.user.User;
 
 import java.sql.*;
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 public class PostgreEventRepository extends AbstractPostgreRepository<Event> implements EventRepository
@@ -110,6 +112,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
                 throw new SQLException("Invalid organizer_id");
             }
 
+            OffsetDateTime creationTime = OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
 
             connection = getConnection();
             connection.setAutoCommit(false);
@@ -119,11 +122,11 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setString(1, event.getTitle());
             preparedStatement.setInt(2, event.getType().getCode());
             preparedStatement.setString(3, event.getCategory());
-            preparedStatement.setTimestamp(4, Timestamp.from(event.getStartTime().toInstant()));
-            preparedStatement.setTimestamp(5, Timestamp.from(event.getEndTime().toInstant()));
+            preparedStatement.setTimestamp(4, Timestamp.from(event.getStartTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+            preparedStatement.setTimestamp(5, Timestamp.from(event.getEndTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
             preparedStatement.setLong(6, organizerId);
-            preparedStatement.setString(7, event.getChatId());
-            preparedStatement.setBoolean(8, event.isFinalized());
+            preparedStatement.setBoolean(7, event.isFinalized());
+            preparedStatement.setTimestamp(8, Timestamp.from(creationTime.toInstant()));
 
             preparedStatement.executeUpdate();
 
@@ -183,19 +186,22 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setLong(8, organizerId);
 
             // Event updates table
+            event.setRsvp(Event.RSVP.YES);
+            event.setAttendeeCount(1);
+            event.setCreateTime(creationTime);
+            event.setUpdateTime(creationTime);
+
             preparedStatement.setObject(9, eventId);
             preparedStatement.setLong(10, organizerId);
-            preparedStatement.setString(11, String.valueOf(EventUpdate.CREATE));
-            preparedStatement.setString(12, Event.Serializer.serialize(event));
+            preparedStatement.setTimestamp(11, Timestamp.from(creationTime.toInstant()));
+            preparedStatement.setString(12, String.valueOf(EventUpdate.CREATE));
+            preparedStatement.setString(13, Event.Serializer.serialize(event));
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
 
             connection.commit();
             connection.close();
-
-            event.setRsvp(Event.RSVP.YES);
-            event.setAttendeeCount(1);
 
             return event.getId();
         }
@@ -244,8 +250,8 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setInt(1, event.getType().getCode());
             preparedStatement.setString(2, event.getCategory());
             preparedStatement.setBoolean(3, event.isFinalized());
-            preparedStatement.setTimestamp(4, Timestamp.from(event.getStartTime().toInstant()));
-            preparedStatement.setTimestamp(5, Timestamp.from(event.getEndTime().toInstant()));
+            preparedStatement.setTimestamp(4, Timestamp.from(event.getStartTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+            preparedStatement.setTimestamp(5, Timestamp.from(event.getEndTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
             preparedStatement.setObject(6, eventId);
 
             // Location
@@ -275,8 +281,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
             preparedStatement.setObject(13, eventId);
             preparedStatement.setLong(14, Long.parseLong(user.getId()));
-            preparedStatement.setString(15, String.valueOf(EventUpdate.EDIT));
-            preparedStatement.setString(16, Event.Serializer.serialize(event));
+            preparedStatement.setTimestamp(15, Timestamp.from(OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+            preparedStatement.setString(16, String.valueOf(EventUpdate.EDIT));
+            preparedStatement.setString(17, Event.Serializer.serialize(event));
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -312,7 +319,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         {
             if (!event.getOrganizerId().equals(user.getId()))
             {
-                throw new SQLException("User (user_id = " + user.getId() + ") is not the evnt organizer");
+                throw new SQLException("User (user_id = " + user.getId() + ") is not the event organizer");
             }
 
             UUID eventId = null;
@@ -334,8 +341,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
             preparedStatement.setObject(2, eventId);
             preparedStatement.setLong(3, Long.parseLong(user.getId()));
-            preparedStatement.setString(4, String.valueOf(EventUpdate.REMOVE));
-            preparedStatement.setString(5, Event.Serializer.serialize(event));
+            preparedStatement.setTimestamp(4, Timestamp.from(OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+            preparedStatement.setString(5, String.valueOf(EventUpdate.REMOVE));
+            preparedStatement.setString(6, Event.Serializer.serialize(event));
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -600,12 +608,6 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             log.error("Unable to read event details for event_id = " + id + "; [" + e.getMessage() + "]");
             return null;
         }
-    }
-
-    @Override
-    public List<Event> getArchive(User user)
-    {
-        return null;
     }
 
     @Override

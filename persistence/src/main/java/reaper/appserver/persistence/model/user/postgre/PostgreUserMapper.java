@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 public class PostgreUserMapper implements PostgreEntityMapper<User>
 {
@@ -35,7 +36,7 @@ public class PostgreUserMapper implements PostgreEntityMapper<User>
         try
         {
             Timestamp timestamp = resultSet.getTimestamp("registered");
-            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+            OffsetDateTime time = OffsetDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
             user.setRegistrationTime(time);
         }
         catch (Exception e)

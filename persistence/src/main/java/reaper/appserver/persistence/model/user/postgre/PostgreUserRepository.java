@@ -8,6 +8,7 @@ import reaper.appserver.persistence.model.user.UserDetails;
 import reaper.appserver.persistence.model.user.UserRepository;
 
 import java.sql.*;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -95,7 +96,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             long userId;
             try
             {
-                userId = Long.parseLong(user.getId());;
+                userId = Long.parseLong(user.getId());
             }
             catch (Exception e)
             {
@@ -108,7 +109,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             preparedStatement.setString(4, user.getFirstname());
             preparedStatement.setString(5, user.getLastname());
             preparedStatement.setString(6, user.getGender().getCode());
-            preparedStatement.setTimestamp(7, Timestamp.from(user.getRegistrationTime().toInstant()));
+            preparedStatement.setTimestamp(7, Timestamp.from(user.getRegistrationTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
             preparedStatement.setString(8, String.valueOf(user.getStatus()));
 
             preparedStatement.executeUpdate();
@@ -138,7 +139,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             preparedStatement.setString(3, user.getFirstname());
             preparedStatement.setString(4, user.getLastname());
             preparedStatement.setString(5, user.getGender().getCode());
-            preparedStatement.setTimestamp(6, Timestamp.from(user.getRegistrationTime().toInstant()));
+            preparedStatement.setTimestamp(6, Timestamp.from(user.getRegistrationTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
             preparedStatement.setString(7, String.valueOf(user.getStatus()));
 
             try

@@ -7,8 +7,8 @@ CREATE TABLE event_info
   start_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
   end_timestamp   TIMESTAMP WITH TIME ZONE NOT NULL,
   organizer_id    BIGINT                   NOT NULL,
-  xmpp_group_id   TEXT,
   finalized       BOOLEAN,
+  create_time     TIMESTAMP WITH TIME ZONE NOT NULL,
   CONSTRAINT event_info_pkey PRIMARY KEY (event_id),
   CONSTRAINT event_updates_user_id_fkey FOREIGN KEY (organizer_id)
   REFERENCES user_info (user_id) MATCH SIMPLE
@@ -29,7 +29,7 @@ CREATE TABLE event_location
   event_id    UUID NOT NULL,
   coordinates POINT,
   name        TEXT,
-  city_cell   TEXT NOT NULL,
+  zone        TEXT NOT NULL,
   CONSTRAINT event_location_event_id_fkey FOREIGN KEY (event_id)
   REFERENCES event_info (event_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE

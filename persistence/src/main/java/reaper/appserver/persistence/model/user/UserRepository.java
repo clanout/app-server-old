@@ -4,29 +4,29 @@ import reaper.appserver.persistence.core.Repository;
 
 import java.util.List;
 
-public interface UserRepository extends Repository<User>
+ public interface UserRepository extends Repository<User>
 {
-    public User getFromUsername(String username);
+     User getFromUsername(String username);
 
-    public UserDetails getUserDetails(String id);
+     UserDetails getUserDetails(String id);
 
-    public UserDetails getUserDetailsLocal(String id, String zone);
+     UserDetails getUserDetailsLocal(String id, String zone);
 
-    public void block(User user, List<String> userIds);
+     void block(User user, List<String> userIds);
 
-    public void unblock(User user, List<String> userIds);
+     void unblock(User user, List<String> userIds);
 
-    public void favourite(User user, List<String> userIds);
+     void favourite(User user, List<String> userIds);
 
-    public void unfavourite(User user, List<String> userIds);
+     void unfavourite(User user, List<String> userIds);
 
-    public void addFriends(User user, List<String> userIds);
+     void addFriends(User user, List<String> userIds);
 
-    public UserDetails getRegisteredContacts(User user, List<String> contacts);
+     UserDetails getRegisteredContacts(User user, List<String> contacts);
 
-    public UserDetails getLocalRegisteredContacts(User user, List<String> contacts, String zone);
+     UserDetails getLocalRegisteredContacts(User user, List<String> contacts, String zone);
 
-    public void setPhone(User user, String phone);
+     void setPhone(User user, String phone);
 
-    public boolean updateLocation(User user, String zone);
+     boolean updateLocation(User user, String zone);
 }

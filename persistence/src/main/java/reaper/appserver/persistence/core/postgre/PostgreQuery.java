@@ -25,10 +25,6 @@ public class PostgreQuery
             }
             return query.toString();
         }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
         catch (IOException e)
         {
             e.printStackTrace();

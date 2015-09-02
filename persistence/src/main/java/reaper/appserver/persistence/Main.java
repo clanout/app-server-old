@@ -28,27 +28,45 @@ public class Main
         UserRepository userRepository = RepositoryFactory.create(User.class);
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
-        User user = userRepository.get("977526725631911");
-        userRepository.addFriends(user, Arrays.asList("976303355745864"));
-        Set<UserDetails.Friend> friends = userRepository.getUserDetails(user.getId()).getFriends();
+        User user = userRepository.get("976303355745864");
+        User user1 = userRepository.get("977526725631911");
 
-        for (UserDetails.Friend friend : friends)
-        {
-            System.out.println(friend.getId() + " : " + friend.getName());
-        }
+        userRepository.unblock(user, Arrays.asList(user1.getId()));
 
-//        List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
-//
-//        for(Event event : events)
-//        {
-//            System.out.println(event.getTitle() + " : " + event.getOrganizerId());
-//        }
+        eventRepository.getVisibleEvents(user, "Bengaluru").forEach(System.out::println);
+        System.out.println();
+        eventRepository.getVisibleEvents(user1, "Bengaluru").forEach(System.out::println);
 
         postgreDatabaseAdapter.close();
     }
 
-    public static void create()
+    public static Event create(User organizer)
     {
+        Event event = new Event();
+        event.setTitle("Event Duo");
+        event.setType(Event.Type.PUBLIC);
+        event.setCategory("GENERAL");
+        event.setOrganizerId(organizer.getId());
+        event.setIsFinalized(false);
 
+        event.setStartTime(OffsetDateTime.now().plusHours(3));
+        event.setEndTime(event.getStartTime().plusHours(2));
+
+        Event.Location location = new Event.Location();
+        location.setZone("Bengaluru");
+        event.setLocation(location);
+
+        return event;
+    }
+
+    public static Event update(Event event)
+    {
+        Event.Location location = new Event.Location();
+        location.setName("Koramangla");
+        location.setLatitude(17.25);
+        location.setLongitude(72.35);
+        location.setZone("Bengaluru");
+        event.setLocation(location);
+        return event;
     }
 }

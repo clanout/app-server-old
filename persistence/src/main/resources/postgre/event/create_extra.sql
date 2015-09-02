@@ -8,4 +8,4 @@ INSERT INTO event_attendees
 VALUES (?, ?, 'YES');
 
 INSERT INTO event_updates
-VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?);
+VALUES (?, ?, ?, ?, ?);

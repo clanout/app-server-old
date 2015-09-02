@@ -4,6 +4,83 @@ import java.util.Set;
 
 public class EventDetails
 {
+    private String id;
+    private String description;
+    private Set<Attendee> attendees;
+    private Set<Invitee> invitee;
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+    public Set<Attendee> getAttendees()
+    {
+        return attendees;
+    }
+
+    public void setAttendees(Set<Attendee> attendees)
+    {
+        this.attendees = attendees;
+    }
+
+    public Set<Invitee> getInvitee()
+    {
+        return invitee;
+    }
+
+    public void setInvitee(Set<Invitee> invitee)
+    {
+        this.invitee = invitee;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == this)
+        {
+            return true;
+        }
+
+        if (!(o instanceof EventDetails))
+        {
+            return false;
+        }
+        else
+        {
+            EventDetails other = (EventDetails) o;
+            if (id.equals(other.id))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
     public static class Attendee
     {
         private String id;
@@ -149,83 +226,6 @@ public class EventDetails
                 {
                     return false;
                 }
-            }
-        }
-    }
-
-    private String id;
-    private String description;
-    private Set<Attendee> attendees;
-    private Set<Invitee> invitee;
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
-
-    public Set<Attendee> getAttendees()
-    {
-        return attendees;
-    }
-
-    public void setAttendees(Set<Attendee> attendees)
-    {
-        this.attendees = attendees;
-    }
-
-    public Set<Invitee> getInvitee()
-    {
-        return invitee;
-    }
-
-    public void setInvitee(Set<Invitee> invitee)
-    {
-        this.invitee = invitee;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return id.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (o == this)
-        {
-            return true;
-        }
-
-        if (!(o instanceof EventDetails))
-        {
-            return false;
-        }
-        else
-        {
-            EventDetails other = (EventDetails) o;
-            if (id.equals(other.id))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
     }

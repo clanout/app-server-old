@@ -11,6 +11,7 @@ import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,8 +94,8 @@ public class EventService
             OffsetDateTime endTime = null;
             try
             {
-                startTime = OffsetDateTime.parse(startTimeStr);
-                endTime = OffsetDateTime.parse(endTimeStr);
+                startTime = OffsetDateTime.parse(startTimeStr).atZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
+                endTime = OffsetDateTime.parse(endTimeStr).atZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
             }
             catch (Exception e)
             {
@@ -124,7 +125,7 @@ public class EventService
             event.setTitle(title);
             event.setType(type);
             event.setCategory(category);
-            event.setFinalized(false);
+            event.setIsFinalized(false);
             event.setStartTime(startTime);
             event.setEndTime(endTime);
             event.setOrganizerId(user.getId());
@@ -248,7 +249,7 @@ public class EventService
             if (isFinalizedStr != null)
             {
                 boolean isFinalized = Boolean.parseBoolean(isFinalizedStr);
-                event.setFinalized(isFinalized);
+                event.setIsFinalized(isFinalized);
 
                 if (isFinalized)
                 {
@@ -269,8 +270,8 @@ public class EventService
 
                 try
                 {
-                    OffsetDateTime startTime = OffsetDateTime.parse(startTimeStr);
-                    OffsetDateTime endTime = OffsetDateTime.parse(endTimeStr);
+                    OffsetDateTime startTime = OffsetDateTime.parse(startTimeStr).atZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
+                    OffsetDateTime endTime = OffsetDateTime.parse(endTimeStr).atZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
 
                     event.setStartTime(startTime);
                     event.setEndTime(endTime);

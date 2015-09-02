@@ -14,6 +14,7 @@ public class RepositoryFactory
 
     private static Logger log = LogUtil.getLogger(RepositoryFactory.class);
 
+    @SuppressWarnings("unchecked")
     public static <R extends Repository<E>, E extends Entity> R create(Class<E> clazz)
     {
         try

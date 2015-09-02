@@ -7,5 +7,5 @@ import java.sql.SQLException;
 
 public interface PostgreEntityMapper<E extends Entity>
 {
-    public E map(ResultSet resultSet) throws SQLException;
+    E map(ResultSet resultSet) throws SQLException;
 }
