@@ -1,12 +1,11 @@
 package reaper.appserver.core.app.controller;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import reaper.appserver.core.app.controller.core.BaseController;
 import reaper.appserver.core.framework.exceptions.BadRequest;
-import reaper.appserver.core.framework.exceptions.ServerError;
 import reaper.appserver.core.framework.request.Request;
 import reaper.appserver.core.framework.response.ResponseFactory;
+import reaper.appserver.core.framework.util.GsonProvider;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.user.UserDetails;
 
@@ -50,8 +49,8 @@ public class MeController extends BaseController
             {
             }.getType();
 
-            blockIdList = (new Gson()).fromJson(blockIdListJson, type);
-            unblockIdList = (new Gson()).fromJson(unblockIdListJson, type);
+            blockIdList = GsonProvider.getGson().fromJson(blockIdListJson, type);
+            unblockIdList = GsonProvider.getGson().fromJson(unblockIdListJson, type);
 
             if (blockIdList == null || unblockIdList == null)
             {
@@ -79,8 +78,8 @@ public class MeController extends BaseController
             {
             }.getType();
 
-            favouriteIdList = (new Gson()).fromJson(favouriteIdListJson, type);
-            unfavouriteIdList = (new Gson()).fromJson(unfavouriteIdListJson, type);
+            favouriteIdList = GsonProvider.getGson().fromJson(favouriteIdListJson, type);
+            unfavouriteIdList = GsonProvider.getGson().fromJson(unfavouriteIdListJson, type);
 
             if (favouriteIdList == null || unfavouriteIdList == null)
             {
@@ -114,7 +113,7 @@ public class MeController extends BaseController
             {
             }.getType();
 
-            contacts = (new Gson()).fromJson(contactsJson, type);
+            contacts = GsonProvider.getGson().fromJson(contactsJson, type);
 
             if (contacts == null)
             {
@@ -161,7 +160,7 @@ public class MeController extends BaseController
             {
             }.getType();
 
-            userIds = (new Gson()).fromJson(userIdJson, type);
+            userIds = GsonProvider.getGson().fromJson(userIdJson, type);
 
             if (userIds == null)
             {

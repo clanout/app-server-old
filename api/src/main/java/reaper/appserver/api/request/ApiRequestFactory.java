@@ -1,7 +1,7 @@
 package reaper.appserver.api.request;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import reaper.appserver.api.util.GsonProvider;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 
 import java.lang.reflect.Type;
@@ -19,7 +19,7 @@ public class ApiRequestFactory
             Type type = new TypeToken<Map<String, String>>()
             {
             }.getType();
-            Map<String, String> requestData = (new Gson()).fromJson(json, type);
+            Map<String, String> requestData = GsonProvider.getGson().fromJson(json, type);
 
             String uri = requestData.remove(URI_KEY);
             String sessionUser = requestData.remove(USER_KEY);

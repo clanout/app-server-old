@@ -6,6 +6,7 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import reaper.appserver.persistence.core.Entity;
+import reaper.appserver.persistence.core.GsonProvider;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -116,7 +117,9 @@ public class Event implements Entity
 
         static
         {
-            GsonBuilder gsonBuilder = Converters.registerAll(new GsonBuilder().serializeNulls().addSerializationExclusionStrategy(new SerializerStrategy()));
+            GsonBuilder gsonBuilder = GsonProvider.getGsonBuilder()
+                    .serializeNulls()
+                    .addSerializationExclusionStrategy(new SerializerStrategy());
             gson = gsonBuilder.create();
         }
 

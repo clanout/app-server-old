@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import reaper.appserver.core.framework.util.GsonProvider;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class BasicJsonParser
 {
-    private static Gson gson = Converters.registerAll(new GsonBuilder()).create();
+    private static Gson gson = GsonProvider.getGson();
 
     public static String getValue(String json, String key)
     {

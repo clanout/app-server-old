@@ -1,6 +1,5 @@
 package reaper.appserver.core.app.controller;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import reaper.appserver.core.app.controller.core.BaseController;
 import reaper.appserver.core.app.service.event.EventService;
@@ -9,6 +8,7 @@ import reaper.appserver.core.app.service.recommendation.RecommendationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.request.Request;
 import reaper.appserver.core.framework.response.ResponseFactory;
+import reaper.appserver.core.framework.util.GsonProvider;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
 
@@ -94,7 +94,7 @@ public class EventController extends BaseController
             {
             }.getType();
 
-            invitedUsers = (new Gson()).fromJson(inviteUsersJson, type);
+            invitedUsers = GsonProvider.getGson().fromJson(inviteUsersJson, type);
             if (invitedUsers == null)
             {
                 throw new NullPointerException();
@@ -153,7 +153,7 @@ public class EventController extends BaseController
             {
             }.getType();
 
-            eventIds = (new Gson()).fromJson(eventIdsJson, type);
+            eventIds = GsonProvider.getGson().fromJson(eventIdsJson, type);
             if (eventIds == null)
             {
                 throw new NullPointerException();

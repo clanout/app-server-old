@@ -1,10 +1,6 @@
 package reaper.appserver.core.app.service.notification;
 
-import com.fatboyindustrial.gsonjavatime.Converters;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
-import reaper.appserver.core.app.service.event.EventService;
 import reaper.appserver.core.app.service.notification.api.ApiManager;
 import reaper.appserver.core.app.service.notification.api.NotificationApi;
 import reaper.appserver.core.app.service.notification.api.request.BroadcastNotificationRequest;
@@ -12,11 +8,10 @@ import reaper.appserver.core.app.service.notification.api.request.MulticastNotif
 import reaper.appserver.core.app.service.notification.api.request.NotificationPullRequest;
 import reaper.appserver.core.app.service.notification.api.request.NotificationRegistrationRequest;
 import reaper.appserver.core.app.service.notification.api.response.NotificationPullResponse;
-import reaper.appserver.core.app.service.user.UserService;
+import reaper.appserver.core.framework.util.GsonProvider;
 import reaper.appserver.log.LogUtil;
 import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.model.event.Event;
-import reaper.appserver.persistence.model.event.EventDetails;
 import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
 import reaper.appserver.persistence.model.user.UserDetails;
@@ -30,13 +25,6 @@ import java.util.Set;
 public class NotificationService
 {
     private static Logger log = LogUtil.getLogger(NotificationService.class);
-
-    private static Gson gson;
-
-    static
-    {
-        gson = Converters.registerAll(new GsonBuilder()).create();
-    }
 
     private NotificationApi api;
     private UserRepository userRepository;
@@ -86,7 +74,7 @@ public class NotificationService
             Response response = api.send(request);
             if (response.getStatus() != 200)
             {
-                log.error("Notification failed : " + gson.toJson(request));
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
             }
         }
         catch (Exception e)
@@ -108,7 +96,7 @@ public class NotificationService
             Response response = api.broadcast(request);
             if (response.getStatus() != 200)
             {
-                log.error("Notification failed : " + gson.toJson(request));
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
             }
         }
         catch (Exception e)
@@ -130,7 +118,7 @@ public class NotificationService
             Response response = api.broadcast(request);
             if (response.getStatus() != 200)
             {
-                log.error("Notification failed : " + gson.toJson(request));
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
             }
         }
         catch (Exception e)
@@ -171,7 +159,7 @@ public class NotificationService
             Response response = api.send(request);
             if (response.getStatus() != 200)
             {
-                log.error("Notification failed : " + gson.toJson(request));
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
             }
         }
         catch (Exception e)
@@ -196,7 +184,7 @@ public class NotificationService
             Response response = api.send(request);
             if (response.getStatus() != 200)
             {
-                log.error("Notification failed : " + gson.toJson(request));
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
             }
         }
         catch (Exception e)
@@ -226,7 +214,7 @@ public class NotificationService
             Response response = api.send(request);
             if (response.getStatus() != 200)
             {
-                log.error("Notification failed : " + gson.toJson(request));
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
             }
         }
         catch (Exception e)

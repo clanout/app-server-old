@@ -322,6 +322,10 @@ public class EventService
             notificationService.eventUpdated(user, event);
             return event;
         }
+        catch (BadRequest e)
+        {
+            throw e;
+        }
         catch (Exception e)
         {
             throw new ServerError(e.getMessage());
