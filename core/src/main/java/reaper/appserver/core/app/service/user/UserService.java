@@ -4,8 +4,6 @@ import reaper.appserver.core.app.service.notification.NotificationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
 import reaper.appserver.persistence.core.RepositoryFactory;
-import reaper.appserver.persistence.model.event.Event;
-import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
 import reaper.appserver.persistence.model.user.UserDetails;
 import reaper.appserver.persistence.model.user.UserRepository;
@@ -121,12 +119,6 @@ public class UserService
     {
         userRepository.unfavourite(user, unfavouriteIds);
         userRepository.favourite(user, favouriteIds);
-    }
-
-    public List<Event> getArchive(User user)
-    {
-        EventRepository eventRepository = RepositoryFactory.create(Event.class);
-        return eventRepository.getArchive(user);
     }
 
     public Set<UserDetails.Friend> getRegisteredContacts(User user, List<String> contacts)

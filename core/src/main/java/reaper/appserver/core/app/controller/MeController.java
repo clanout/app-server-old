@@ -94,13 +94,6 @@ public class MeController extends BaseController
         userService.toggleFavourite(activeUser, favouriteIdList, unfavouriteIdList);
     }
 
-    public void archiveAction()
-    {
-        List<Event> archive = userService.getArchive(activeUser);
-
-        response.set("archive", archive);
-    }
-
     public void contactsAction()
     {
         List<String> contacts = null;
