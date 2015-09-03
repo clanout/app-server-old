@@ -19,33 +19,40 @@ SELECT
   g.friend_count
 FROM
   (
-    SELECT DISTINCT event_attendees.event_id AS event_id
+    SELECT DISTINCT events_of_friends.event_id
     FROM
       (
-        SELECT user_id2 AS user_id
-        FROM user_relationships
-        WHERE user_id1 = ? AND status <> FALSE
-        UNION
-        SELECT user_id1 AS user_id
-        FROM user_relationships
-        WHERE user_id2 = ? AND status <> FALSE
-        UNION
-        SELECT ? AS user_id
-      ) relevant_users,
-      event_attendees
-    WHERE event_attendees.attendee_id = relevant_users.user_id
+        SELECT DISTINCT event_attendees.event_id AS event_id
+        FROM
+          (
+            SELECT user_id2 AS friend_id
+            FROM user_relationships
+            WHERE user_id1 = ? AND status <> FALSE
+            UNION
+            SELECT user_id1 AS friend_id
+            FROM user_relationships
+            WHERE user_id2 = ? AND status <> FALSE
+          ) friends,
+          event_attendees
+        WHERE event_attendees.attendee_id = friends.friend_id
+      ) events_of_friends
+      INNER JOIN
+      (
+        SELECT event_info.event_id
+        FROM event_info
+        WHERE type <> 1
+      ) public_events
+        ON public_events.event_id = events_of_friends.event_id
+    UNION
+    SELECT event_id
+    FROM event_attendees
+    WHERE attendee_id = ?
     UNION
     SELECT event_invitees.event_id
     FROM event_invitees
     WHERE event_invitees.invitee_id = ?
   ) visible
-  INNER JOIN
-  (
-    SELECT *
-    FROM event_info
-    WHERE type <> 1
-          OR organizer_id = ?
-  ) a
+  INNER JOIN event_info a
     ON visible.event_id = a.event_id
   INNER JOIN event_location b ON visible.event_id = b.event_id AND b.zone = ?
   INNER JOIN
