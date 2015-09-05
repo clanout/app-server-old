@@ -1,5 +1,6 @@
 package reaper.appserver.core.app.service.user;
 
+import reaper.appserver.core.app.service.chat.ChatService;
 import reaper.appserver.core.app.service.notification.NotificationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
@@ -16,11 +17,13 @@ public class UserService
 {
     private UserRepository userRepository;
     private NotificationService notificationService;
+    private ChatService chatService;
 
     public UserService()
     {
         userRepository = RepositoryFactory.create(User.class);
         notificationService = new NotificationService();
+        chatService = new ChatService();
     }
 
     public void create(String userId, String username, String firstname, String lastname, String gender)
@@ -76,6 +79,8 @@ public class UserService
         {
             throw new ServerError();
         }
+
+        chatService.createUser(user);
     }
 
     public User get(String userId)

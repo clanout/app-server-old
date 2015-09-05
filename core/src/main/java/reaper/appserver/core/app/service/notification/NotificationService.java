@@ -40,10 +40,17 @@ public class NotificationService
     public void register(String userId, String token)
     {
         NotificationRegistrationRequest registration = new NotificationRegistrationRequest(userId, token);
-        Response response = api.register(registration);
-        if (response.getStatus() != 200)
+
+        try
         {
-            log.error("Notification Registration Failed for user = " + userId);
+            Response response = api.register(registration);
+            if (response.getStatus() != 200)
+            {
+                log.error("Notification Registration Failed for user = " + userId);
+            }
+        }catch (Exception e)
+        {
+
         }
     }
 
