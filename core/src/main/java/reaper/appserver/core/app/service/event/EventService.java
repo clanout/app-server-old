@@ -1,9 +1,11 @@
 package reaper.appserver.core.app.service.event;
 
+import org.apache.log4j.Logger;
 import reaper.appserver.core.app.service.chat.ChatService;
 import reaper.appserver.core.app.service.notification.NotificationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
+import reaper.appserver.log.LogUtil;
 import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
@@ -17,6 +19,8 @@ import java.util.List;
 
 public class EventService
 {
+    private static Logger LOG = LogUtil.getLogger(EventService.class);
+
     private EventRepository eventRepository;
     private ChatService chatService;
     private NotificationService notificationService;
@@ -155,6 +159,7 @@ public class EventService
         }
         catch (Exception e)
         {
+            LOG.error("Event.create() failed", e);
             throw new ServerError(e.getMessage());
         }
     }
@@ -288,10 +293,10 @@ public class EventService
             {
                 if(isAlreadyFinalized)
                 {
-                    throw new BadRequest("Cannot chage the location for a finalized event");
+                    throw new BadRequest("Cannot change the location for a finalized event");
                 }
 
-                Event.Location location = new Event.Location();
+                Event.Location location = event.getLocation();
                 location.setName(locationName);
                 location.setZone(locationZone);
                 try
@@ -329,6 +334,7 @@ public class EventService
         }
         catch (Exception e)
         {
+            LOG.error("Event.update() failed", e);
             throw new ServerError(e.getMessage());
         }
     }

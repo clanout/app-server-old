@@ -29,15 +29,12 @@ public class Main
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
         User user = userRepository.get("977526725631911");
-        User user1 = userRepository.get("977526725631911");
+        User user1 = userRepository.get("976303355745864");
 
-//        userRepository.unblock(user, Arrays.asList(user1.getId()));
+        String eventId = "f7a45075-7f8c-45fe-b571-478012808cd0";
 
-        List<Event> events = eventRepository.getVisibleEvents(user, "Bengaluru");
-        System.out.println(events.size());
-        events.forEach(System.out::println);
-//        System.out.println();
-//        eventRepository.getVisibleEvents(user1, "Bengaluru").forEach(System.out::println);
+        System.out.println(gson.toJson(eventRepository.getDetails(eventId, user).getInvitee()));
+        System.out.println(gson.toJson(eventRepository.getDetails(eventId, user1).getInvitee()));
 
         postgreDatabaseAdapter.close();
     }
