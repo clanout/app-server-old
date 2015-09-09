@@ -22,4 +22,6 @@ public interface EventRepository extends Repository<Event>
     void createInvitation(String id, User from, List<String> to);
 
     EventDetails getDetails(String id, User user);
+
+    void setFinalizationState(Event event, boolean isFinalized);
 }

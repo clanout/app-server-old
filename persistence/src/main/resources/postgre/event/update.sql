@@ -1,7 +1,6 @@
 UPDATE event_info
 SET type          = ?,
   category        = ?,
-  finalized       = ?,
   start_timestamp = ?,
   end_timestamp   = ?
 WHERE event_id = ?;

@@ -27,6 +27,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     private static final String SQL_READ_DETAILS_DESCRIPTION = PostgreQuery.load("event/read_details_description.sql");
 
     private static final String SQL_UPDATE = PostgreQuery.load("event/update.sql");
+    private static final String SQL_UPDATE_FINALIZATION = PostgreQuery.load("event/update_finalization.sql");
 
     private static final String SQL_DELETE = PostgreQuery.load("event/delete.sql");
 
@@ -155,7 +156,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             Event.Location location = event.getLocation();
             preparedStatement.setObject(1, eventId);
 
-            PGpoint coordinates = new PGpoint(-1.0, -1.0);
+            PGpoint coordinates = new PGpoint(-1000.0, -1000.0);
             if (location.getLatitude() != null && location.getLatitude() != null)
             {
                 coordinates = new PGpoint(location.getLongitude(), location.getLatitude());
@@ -249,41 +250,40 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
             preparedStatement.setInt(1, event.getType().getCode());
             preparedStatement.setString(2, event.getCategory());
-            preparedStatement.setBoolean(3, event.isFinalized());
-            preparedStatement.setTimestamp(4, Timestamp.from(event.getStartTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
-            preparedStatement.setTimestamp(5, Timestamp.from(event.getEndTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
-            preparedStatement.setObject(6, eventId);
+            preparedStatement.setTimestamp(3, Timestamp.from(event.getStartTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+            preparedStatement.setTimestamp(4, Timestamp.from(event.getEndTime().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+            preparedStatement.setObject(5, eventId);
 
             // Location
             Event.Location location = event.getLocation();
 
             if (location.getName() != null)
             {
-                preparedStatement.setString(7, location.getName());
+                preparedStatement.setString(6, location.getName());
             }
             else
             {
-                preparedStatement.setNull(7, Types.VARCHAR);
+                preparedStatement.setNull(6, Types.VARCHAR);
             }
 
-            PGpoint coordinates = new PGpoint(-1.0, -1.0);
+            PGpoint coordinates = new PGpoint(-1000.0, -1000.0);
             if (location.getLatitude() != null && location.getLatitude() != null)
             {
                 coordinates = new PGpoint(location.getLongitude(), location.getLatitude());
             }
-            preparedStatement.setObject(8, coordinates);
+            preparedStatement.setObject(7, coordinates);
 
-            preparedStatement.setString(9, location.getZone());
-            preparedStatement.setObject(10, eventId);
+            preparedStatement.setString(8, location.getZone());
+            preparedStatement.setObject(9, eventId);
 
-            preparedStatement.setString(11, description);
-            preparedStatement.setObject(12, eventId);
+            preparedStatement.setString(10, description);
+            preparedStatement.setObject(11, eventId);
 
             preparedStatement.setObject(13, eventId);
-            preparedStatement.setLong(14, Long.parseLong(user.getId()));
-            preparedStatement.setTimestamp(15, Timestamp.from(OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
-            preparedStatement.setString(16, String.valueOf(EventUpdate.EDIT));
-            preparedStatement.setString(17, Event.Serializer.serialize(event));
+            preparedStatement.setLong(13, Long.parseLong(user.getId()));
+            preparedStatement.setTimestamp(14, Timestamp.from(OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+            preparedStatement.setString(15, String.valueOf(EventUpdate.EDIT));
+            preparedStatement.setString(16, Event.Serializer.serialize(event));
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -607,6 +607,28 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             log.error("Unable to read event details for event_id = " + id + "; [" + e.getMessage() + "]");
             return null;
         }
+    }
+
+    @Override
+    public void setFinalizationState(Event event, boolean isFinalized)
+    {
+        try
+        {
+            Connection connection = getConnection();
+
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_FINALIZATION);
+            preparedStatement.setBoolean(1, isFinalized);
+            preparedStatement.setString(2, event.getId());
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to set event finalization [" + e.getMessage() + "]");
+        }
+
     }
 
     @Override

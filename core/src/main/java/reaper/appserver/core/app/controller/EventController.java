@@ -174,4 +174,22 @@ public class EventController extends BaseController
         response.set("updated_events", updatedEvents);
         response.set("deleted_events", deletedEvents);
     }
+
+    public void finalizeAction()
+    {
+        String eventId = request.getData("event_id");
+        boolean isFinalized;
+
+        try
+        {
+            String isFinalizedStr = request.getData("is_finalized");
+            isFinalized = Boolean.parseBoolean(isFinalizedStr);
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("unable to parse is_finalized value");
+        }
+
+        eventService.finalize(eventId, isFinalized, activeUser);
+    }
 }

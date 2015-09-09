@@ -247,32 +247,15 @@ public class EventService
             throw new BadRequest("Cannot get event from event_id  = " + eventId);
         }
 
-        boolean isAlreadyFinalized = event.isFinalized();
+        if (event.isFinalized())
+        {
+            throw new BadRequest("Cannot edit a finalized event");
+        }
 
         try
         {
-            if (isFinalizedStr != null)
-            {
-                boolean isFinalized = Boolean.parseBoolean(isFinalizedStr);
-                event.setIsFinalized(isFinalized);
-
-                if (isFinalized)
-                {
-                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has finalized this event");
-                }
-                else
-                {
-                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has unlocked this event");
-                }
-            }
-
             if (startTimeStr != null && endTimeStr != null)
             {
-                if(isAlreadyFinalized)
-                {
-                    throw new BadRequest("Cannot reschedule a finalized event");
-                }
-
                 try
                 {
                     OffsetDateTime startTime = OffsetDateTime.parse(startTimeStr).atZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
@@ -291,30 +274,33 @@ public class EventService
 
             if (locationZone != null)
             {
-                if(isAlreadyFinalized)
-                {
-                    throw new BadRequest("Cannot change the location for a finalized event");
-                }
-
                 Event.Location location = event.getLocation();
                 location.setName(locationName);
                 location.setZone(locationZone);
-                try
+
+                if (locationLatitude != null && locationLongitude != null)
                 {
-                    Double x = Double.parseDouble(locationLongitude);
-                    Double y = Double.parseDouble(locationLatitude);
+                    try
+                    {
+                        Double x = Double.parseDouble(locationLongitude);
+                        Double y = Double.parseDouble(locationLatitude);
 
-                    location.setLongitude(x);
-                    location.setLatitude(y);
-
-                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event location");
+                        location.setLongitude(x);
+                        location.setLatitude(y);
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        throw new BadRequest("Event Longitude/Latitude have to be numeric");
+                    }
                 }
-                catch (NumberFormatException e)
+                else
                 {
-                    throw new BadRequest("Event Longitude/Latitude have to be numeric");
+                    location.setLongitude(null);
+                    location.setLatitude(null);
                 }
-
                 event.setLocation(location);
+
+                chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event location");
             }
 
             eventRepository.update(event, user, description);
@@ -346,7 +332,7 @@ public class EventService
         while (index < allEvents.size())
         {
             Event event = allEvents.get(index);
-            if(!eventIds.contains(event.getId()))
+            if (!eventIds.contains(event.getId()))
             {
                 newEvents.add(event);
                 allEvents.remove(index);
@@ -373,9 +359,9 @@ public class EventService
 
 
         List<Event> updatedEvents = new ArrayList<>();
-        for(Event event : allEvents)
+        for (Event event : allEvents)
         {
-            if(event.getUpdateTime().isAfter(lastUpdated))
+            if (event.getUpdateTime().isAfter(lastUpdated))
             {
                 updatedEvents.add(event);
             }
@@ -388,14 +374,14 @@ public class EventService
         List<String> allEventIds = new ArrayList<>(allEvents.size());
         List<String> deletedEvents = new ArrayList<>();
 
-        for(Event event: allEvents)
+        for (Event event : allEvents)
         {
             allEventIds.add(event.getId());
         }
 
-        for(String eventId:eventIds)
+        for (String eventId : eventIds)
         {
-            if(!allEventIds.contains(eventId))
+            if (!allEventIds.contains(eventId))
             {
                 deletedEvents.add(eventId);
             }
@@ -404,4 +390,33 @@ public class EventService
         return deletedEvents;
     }
 
+    public void finalize(String eventId, boolean isFinalized, User user)
+    {
+        if (eventId == null || eventId.isEmpty())
+        {
+            throw new BadRequest("Cannot finalize/unfinalize event; invalid event_id");
+        }
+
+        Event event = eventRepository.get(eventId, user);
+        if (event == null)
+        {
+            throw new BadRequest("Cannot get event from event_id  = " + eventId);
+        }
+
+        if (!event.getOrganizerId().equals(user.getId()))
+        {
+            throw new BadRequest("only organizer can finalize/unfinalize an event");
+        }
+
+        eventRepository.setFinalizationState(event, isFinalized);
+
+        if (isFinalized)
+        {
+            chatService.postMessages(eventId, user.getFirstname() + " " + user.getLastname() + " has finalized this event");
+        }
+        else
+        {
+            chatService.postMessages(eventId, user.getFirstname() + " " + user.getLastname() + " has unlocked this event");
+        }
+    }
 }

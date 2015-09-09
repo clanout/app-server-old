@@ -48,8 +48,19 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         event.setIsFinalized(resultSet.getBoolean("finalized"));
 
         Event.Location location = new Event.Location();
-        location.setLongitude(resultSet.getDouble("longitude"));
-        location.setLatitude(resultSet.getDouble("latitude"));
+        double latitude = resultSet.getDouble("latitude");
+        double longitude = resultSet.getDouble("longitude");
+
+        if(latitude == -1000.0 || longitude == -1000.0)
+        {
+            location.setLatitude(null);
+            location.setLongitude(null);
+        }
+        else
+        {
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+        }
         location.setName(resultSet.getString("location_name"));
         location.setZone(resultSet.getString("location_zone"));
         event.setLocation(location);
