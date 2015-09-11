@@ -157,7 +157,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setObject(1, eventId);
 
             PGpoint coordinates = new PGpoint(-1000.0, -1000.0);
-            if (location.getLatitude() != null && location.getLatitude() != null)
+            if (location.getLatitude() != null && location.getLongitude() != null)
             {
                 coordinates = new PGpoint(location.getLongitude(), location.getLatitude());
             }
@@ -267,7 +267,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             }
 
             PGpoint coordinates = new PGpoint(-1000.0, -1000.0);
-            if (location.getLatitude() != null && location.getLatitude() != null)
+            if (location.getLatitude() != null && location.getLongitude() != null)
             {
                 coordinates = new PGpoint(location.getLongitude(), location.getLatitude());
             }
@@ -279,7 +279,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setString(10, description);
             preparedStatement.setObject(11, eventId);
 
-            preparedStatement.setObject(13, eventId);
+            preparedStatement.setObject(12, eventId);
             preparedStatement.setLong(13, Long.parseLong(user.getId()));
             preparedStatement.setTimestamp(14, Timestamp.from(OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
             preparedStatement.setString(15, String.valueOf(EventUpdate.EDIT));
@@ -307,6 +307,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             }
 
             log.error("Unable to update event with event_id = " + event.getId() + " [" + e.getMessage() + "]");
+
         }
     }
 
@@ -610,25 +611,37 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     }
 
     @Override
-    public void setFinalizationState(Event event, boolean isFinalized)
+    public boolean setFinalizationState(Event event, boolean isFinalized)
     {
         try
         {
+            UUID eventId = null;
+            try
+            {
+                eventId = UUID.fromString(event.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id");
+            }
+
             Connection connection = getConnection();
 
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_FINALIZATION);
             preparedStatement.setBoolean(1, isFinalized);
-            preparedStatement.setString(2, event.getId());
+            preparedStatement.setObject(2, eventId);
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
             connection.close();
+
+            return true;
         }
         catch (SQLException e)
         {
             log.error("Unable to set event finalization [" + e.getMessage() + "]");
+            return false;
         }
-
     }
 
     @Override

@@ -418,7 +418,10 @@ public class EventService
             throw new BadRequest("only organizer can finalize/unfinalize an event");
         }
 
-        eventRepository.setFinalizationState(event, isFinalized);
+        if(!eventRepository.setFinalizationState(event, isFinalized))
+        {
+            throw new ServerError("unable to finalize/unfinalize event");
+        }
 
         if (isFinalized)
         {

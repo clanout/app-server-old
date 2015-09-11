@@ -23,5 +23,5 @@ public interface EventRepository extends Repository<Event>
 
     EventDetails getDetails(String id, User user);
 
-    void setFinalizationState(Event event, boolean isFinalized);
+    boolean setFinalizationState(Event event, boolean isFinalized);
 }
