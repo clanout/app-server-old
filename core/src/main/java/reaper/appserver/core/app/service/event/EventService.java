@@ -11,6 +11,7 @@ import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
 import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.user.User;
+import sun.rmi.runtime.Log;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -252,10 +253,15 @@ public class EventService
             throw new BadRequest("Cannot edit a finalized event");
         }
 
+        LOG.info("Finalization : " + isFinalizedStr);
+
         try
         {
             if (startTimeStr != null && endTimeStr != null)
             {
+
+                LOG.info("Received time edit\nStart Time: " + startTimeStr + "\nEnd Time: " + endTimeStr);
+
                 try
                 {
                     OffsetDateTime startTime = OffsetDateTime.parse(startTimeStr).atZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
@@ -274,6 +280,9 @@ public class EventService
 
             if (locationZone != null)
             {
+                LOG.info("Received Location edit\nZone : " + locationZone + "\nName: " + locationName
+                        + "\nCo-ordinates : " + locationLongitude + "," + locationLatitude);
+
                 Event.Location location = event.getLocation();
                 location.setName(locationName);
                 location.setZone(locationZone);
@@ -308,6 +317,7 @@ public class EventService
             for (String chatUpdate : chatUpdates)
             {
                 chatService.postMessages(event.getChatId(), chatUpdate);
+                LOG.info("Chat Message : " + chatUpdate);
             }
 
             event = eventRepository.get(eventId, user);
