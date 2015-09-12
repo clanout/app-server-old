@@ -15,7 +15,9 @@ public class Notification
         EVENT_REMOVED,
         EVENT_UPDATED,
         EVENT_INVITATION,
-        FRIEND_RELOCATED
+        FRIEND_RELOCATED,
+        BLOCKED,
+        UNBLOCKED
     }
 
     private Notification(Type type)

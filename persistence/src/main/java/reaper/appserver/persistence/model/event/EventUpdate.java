@@ -6,6 +6,6 @@ public enum EventUpdate
     EDIT,
     REMOVE,
     FINALIZE,
-    RSVP,
+    UNFINALIZED,
     COMPLETE;
 }

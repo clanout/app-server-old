@@ -118,6 +118,9 @@ public class UserService
     {
         userRepository.unblock(user, unblockIds);
         userRepository.block(user, blockIds);
+
+        notificationService.usersBlocked(user, blockIds);
+        notificationService.usersUnblocked(user, unblockIds);
     }
 
     public void toggleFavourite(User user, List<String> favouriteIds, List<String> unfavouriteIds)

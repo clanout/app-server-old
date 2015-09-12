@@ -229,4 +229,48 @@ public class NotificationService
             log.error("Notification failed [" + e.getMessage() + "]");
         }
     }
+
+    public void usersBlocked(User user, List<String> blockedIds)
+    {
+        try
+        {
+            Notification notification = new Notification.Builder(Notification.Type.BLOCKED)
+                    .addParameter("user_id", user.getId())
+                    .addParameter("name", user.getFirstname() + " " + user.getLastname())
+                    .build();
+
+            MulticastNotificationRequest request = new MulticastNotificationRequest(new HashSet<>(blockedIds), notification);
+            Response response = api.send(request);
+            if (response.getStatus() != 200)
+            {
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Notification failed [" + e.getMessage() + "]");
+        }
+    }
+
+    public void usersUnblocked(User user, List<String> unblockedIds)
+    {
+        try
+        {
+            Notification notification = new Notification.Builder(Notification.Type.UNBLOCKED)
+                    .addParameter("user_id", user.getId())
+                    .addParameter("name", user.getFirstname() + " " + user.getLastname())
+                    .build();
+
+            MulticastNotificationRequest request = new MulticastNotificationRequest(new HashSet<>(unblockedIds), notification);
+            Response response = api.send(request);
+            if (response.getStatus() != 200)
+            {
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Notification failed [" + e.getMessage() + "]");
+        }
+    }
 }

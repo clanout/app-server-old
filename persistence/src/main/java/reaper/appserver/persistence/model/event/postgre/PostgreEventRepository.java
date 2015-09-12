@@ -631,6 +631,20 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setBoolean(1, isFinalized);
             preparedStatement.setObject(2, eventId);
 
+            preparedStatement.setObject(3, eventId);
+            preparedStatement.setLong(4, Long.parseLong(event.getOrganizerId()));
+            preparedStatement.setTimestamp(5, Timestamp.from(OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+
+            if(isFinalized)
+            {
+                preparedStatement.setString(6, String.valueOf(EventUpdate.FINALIZE));
+            }
+            else
+            {
+                preparedStatement.setString(6, String.valueOf(EventUpdate.UNFINALIZED));
+            }
+            preparedStatement.setString(7, Event.Serializer.serialize(event));
+
             preparedStatement.executeUpdate();
             preparedStatement.close();
             connection.close();
