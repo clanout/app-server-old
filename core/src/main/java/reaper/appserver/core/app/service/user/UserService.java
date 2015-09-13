@@ -103,7 +103,7 @@ public class UserService
 
     public Set<UserDetails.Friend> getLocalFriends(User user, String zone)
     {
-        UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId(), zone);
+        UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId());
         if (userDetails == null)
         {
             throw new ServerError("Unable to local friends for user_id = " + user.getId());

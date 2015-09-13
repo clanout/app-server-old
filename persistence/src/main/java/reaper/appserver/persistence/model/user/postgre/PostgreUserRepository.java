@@ -253,7 +253,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
     }
 
     @Override
-    public UserDetails getUserDetailsLocal(String id, String zone)
+    public UserDetails getUserDetailsLocal(String id)
     {
         try
         {
@@ -267,20 +267,33 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
                 throw new SQLException("Invalid user_id");
             }
 
+            String zone = null;
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_LOCATION);
+            preparedStatement.setLong(1, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                zone = resultSet.getString("location");
+                break;
+            }
+            resultSet.close();
+            preparedStatement.close();
+
             UserDetails userDetails = new UserDetails();
             userDetails.setId(id);
             Set<UserDetails.Friend> friends = new HashSet<>();
             userDetails.setFriends(friends);
 
-            Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_DETAILS_LOCAL);
-
+            preparedStatement = connection.prepareStatement(SQL_READ_DETAILS_LOCAL);
             preparedStatement.setLong(1, userId);
             preparedStatement.setLong(2, userId);
             preparedStatement.setString(3, zone);
             preparedStatement.setLong(4, userId);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
             {
                 UserDetails.Friend friend = new UserDetails.Friend();
@@ -525,7 +538,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             {
                 for (String friendId : userIds)
                 {
-                    if(!friends.contains(friendId))
+                    if (!friends.contains(friendId))
                     {
                         friendIds.add(Long.parseLong(friendId));
                     }
@@ -713,7 +726,7 @@ public class PostgreUserRepository extends AbstractPostgreRepository<User> imple
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
             {
-                if(!resultSet.getString("location").equalsIgnoreCase(zone))
+                if (!resultSet.getString("location").equalsIgnoreCase(zone))
                 {
                     result = true;
                     break;

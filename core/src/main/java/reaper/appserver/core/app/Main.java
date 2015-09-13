@@ -2,13 +2,20 @@ package reaper.appserver.core.app;
 
 import reaper.appserver.core.app.service.chat.ChatService;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        String eventId = "2508b353-67f5-42d4-96c1-0777534792d4";
+        List<Double> a = Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0);
 
-        ChatService chatService = new ChatService();
-        chatService.postMessages(eventId, "fjfjjk");
+        List<Double> b = a.stream().map(Math::sqrt).collect(Collectors.toList());
+
+        System.out.println(b);
     }
 }

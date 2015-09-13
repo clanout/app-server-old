@@ -21,6 +21,9 @@ import retrofit.client.Response;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class NotificationService
 {
@@ -48,7 +51,8 @@ public class NotificationService
             {
                 log.error("Notification Registration Failed for user = " + userId);
             }
-        }catch (Exception e)
+        }
+        catch (Exception e)
         {
 
         }
@@ -63,19 +67,23 @@ public class NotificationService
 
     public void eventCreated(User user, Event event)
     {
+        if (event.getType() == Event.Type.INVITE_ONLY)
+        {
+            return;
+        }
+
         try
         {
-            Notification notification = new Notification.Builder(Notification.Type.EVENT_ADDED)
-                    .message(user.getFirstname() + " " + user.getLastname() + " created a new event '" + event.getTitle() + "'")
+            Notification notification = new Notification.Builder(Notification.Type.EVENT_CREATED)
                     .addParameter("event_id", event.getId())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .build();
 
-            Set<UserDetails.Friend> friends = userRepository.getUserDetails(user.getId()).getFriends();
-            Set<String> userIds = new HashSet<>(friends.size());
-            for (UserDetails.Friend friend : friends)
-            {
-                userIds.add(friend.getId());
-            }
+            Set<String> userIds = userRepository.getUserDetailsLocal(user.getId())
+                    .getFriends()
+                    .stream()
+                    .map(UserDetails.Friend::getId)
+                    .collect(Collectors.toSet());
 
             MulticastNotificationRequest request = new MulticastNotificationRequest(userIds, notification);
             Response response = api.send(request);

@@ -10,7 +10,7 @@ import java.util.List;
 
      UserDetails getUserDetails(String id);
 
-     UserDetails getUserDetailsLocal(String id, String zone);
+     UserDetails getUserDetailsLocal(String id);
 
      void block(User user, List<String> userIds);
 
