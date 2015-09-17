@@ -28,13 +28,11 @@ public class Main
         UserRepository userRepository = RepositoryFactory.create(User.class);
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
-        User user = userRepository.get("977526725631911");
-        User user1 = userRepository.get("976303355745864");
+        User user = userRepository.get("976303355745864");
+        System.out.println(user);
 
-        String eventId = "f7a45075-7f8c-45fe-b571-478012808cd0";
-
-        System.out.println(gson.toJson(eventRepository.getDetails(eventId, user).getInvitee()));
-        System.out.println(gson.toJson(eventRepository.getDetails(eventId, user1).getInvitee()));
+        UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId());
+        System.out.println(gson.toJson(userDetails));
 
         postgreDatabaseAdapter.close();
     }

@@ -2,7 +2,6 @@ package reaper.appserver.core.app.service.notification;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class Notification
 {
@@ -36,7 +35,7 @@ public class Notification
         public Builder(Type type)
         {
             notification = new Notification(type);
-            notification.parameters.put("notification_id", UUID.randomUUID().toString());
+            notification.parameters.put("notification_id", String.valueOf((int) (Math.random() * 1000000000)));
         }
 
         public Notification build()
