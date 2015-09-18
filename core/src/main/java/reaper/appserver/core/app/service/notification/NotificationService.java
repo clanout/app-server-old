@@ -143,31 +143,25 @@ public class NotificationService
 
     public void rsvpChanged(User user, Event event, Event.RSVP rsvp)
     {
+        if(rsvp == Event.RSVP.NO)
+        {
+            return;
+        }
+
         try
         {
-            Notification notification = null;
+            Notification notification = new Notification.Builder(Notification.Type.RSVP)
+                    .addParameter("event_id", event.getId())
+                    .addParameter("event_name", event.getTitle())
+                    .addParameter("user_id", user.getId())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
+                    .build();
 
-            if (rsvp == Event.RSVP.YES)
-            {
-                notification = new Notification.Builder(Notification.Type.EVENT_ADDED)
-                        .message(user.getFirstname() + " " + user.getLastname() + " is attending the event '" + event.getTitle() + "'")
-                        .addParameter("event_id", event.getId())
-                        .build();
-            }
-            else
-            {
-                notification = new Notification.Builder(Notification.Type.EVENT_REMOVED)
-                        .message(user.getFirstname() + " " + user.getLastname() + " is no longer attending the event '" + event.getTitle() + "'")
-                        .addParameter("event_id", event.getId())
-                        .build();
-            }
-
-            Set<UserDetails.Friend> friends = userRepository.getUserDetails(user.getId()).getFriends();
-            Set<String> userIds = new HashSet<>(friends.size());
-            for (UserDetails.Friend friend : friends)
-            {
-                userIds.add(friend.getId());
-            }
+            Set<String> userIds = userRepository.getUserDetailsLocal(user.getId())
+                    .getFriends()
+                    .stream()
+                    .map(UserDetails.Friend::getId)
+                    .collect(Collectors.toSet());
 
             MulticastNotificationRequest request = new MulticastNotificationRequest(userIds, notification);
             Response response = api.send(request);

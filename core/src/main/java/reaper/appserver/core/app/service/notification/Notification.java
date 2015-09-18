@@ -13,6 +13,7 @@ public class Notification
     {
         EVENT_CREATED,
         EVENT_INVITATION,
+        RSVP,
 
         EVENT_ADDED,
         EVENT_REMOVED,
