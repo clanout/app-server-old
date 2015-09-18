@@ -16,11 +16,9 @@ public class Notification
         RSVP,
         EVENT_REMOVED,
         EVENT_UPDATED,
-
-        EVENT_ADDED,
-        FRIEND_RELOCATED,
         BLOCKED,
-        UNBLOCKED
+        UNBLOCKED,
+        FRIEND_RELOCATED;
     }
 
     private Notification(Type type)

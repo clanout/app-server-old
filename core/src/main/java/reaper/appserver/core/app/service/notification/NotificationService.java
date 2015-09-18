@@ -215,12 +215,11 @@ public class NotificationService
                     .addParameter("zone", newZone)
                     .build();
 
-            Set<UserDetails.Friend> friends = userRepository.getUserDetails(user.getId()).getFriends();
-            Set<String> userIds = new HashSet<>(friends.size());
-            for (UserDetails.Friend friend : friends)
-            {
-                userIds.add(friend.getId());
-            }
+            Set<String> userIds = userRepository.getUserDetails(user.getId())
+                    .getFriends()
+                    .stream()
+                    .map(UserDetails.Friend::getId)
+                    .collect(Collectors.toSet());
 
             MulticastNotificationRequest request = new MulticastNotificationRequest(userIds, notification);
             Response response = api.send(request);
