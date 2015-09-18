@@ -141,9 +141,9 @@ public class NotificationService
         }
     }
 
-    public void rsvpChanged(User user, Event event, Event.RSVP rsvp)
+    public void rsvpChanged(User user, Event event, Event.RSVP rsvp, Event.RSVP oldRsvp)
     {
-        if(rsvp == Event.RSVP.NO)
+        if(rsvp == Event.RSVP.NO || oldRsvp != Event.RSVP.NO)
         {
             return;
         }

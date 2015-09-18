@@ -212,11 +212,12 @@ public class EventService
         {
             throw new BadRequest("Cannot set rsvp; invalid event_id");
         }
+        Event event = eventRepository.get(eventId, user);
+
+        Event.RSVP oldRsvp = event.getRsvp();
 
         eventRepository.setRSVP(eventId, user, rsvp);
-
-        Event event = eventRepository.get(eventId, user);
-        notificationService.rsvpChanged(user, event, rsvp);
+        notificationService.rsvpChanged(user, event, rsvp, oldRsvp);
     }
 
     public void invite(String eventId, User user, List<String> invitedUsers)
