@@ -187,9 +187,9 @@ public class NotificationService
         try
         {
             Notification notification = new Notification.Builder(Notification.Type.EVENT_INVITATION)
-                    .message(from.getFirstname() + " " + from.getLastname() + " invited you to the event '" + event.getTitle() + "'")
                     .addParameter("event_id", event.getId())
-                    .addParameter("user_id", from.getId())
+                    .addParameter("event_name", event.getTitle())
+                    .addParameter("user_name", from.getFirstname() + " " + from.getLastname())
                     .build();
 
             Set<String> userIds = new HashSet<>(to);
