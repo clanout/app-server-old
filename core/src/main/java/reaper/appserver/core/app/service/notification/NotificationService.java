@@ -21,8 +21,6 @@ import retrofit.client.Response;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class NotificationService
@@ -76,6 +74,7 @@ public class NotificationService
         {
             Notification notification = new Notification.Builder(Notification.Type.EVENT_CREATED)
                     .addParameter("event_id", event.getId())
+                    .addParameter("event_name", event.getTitle())
                     .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .build();
 
