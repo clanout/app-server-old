@@ -124,8 +124,8 @@ public class NotificationService
         try
         {
             Notification notification = new Notification.Builder(Notification.Type.EVENT_REMOVED)
-                    .message(user.getFirstname() + " " + user.getLastname() + " deleted the event '" + event.getTitle() + "'")
                     .addParameter("event_id", event.getId())
+                    .addParameter("event_name", event.getTitle())
                     .build();
 
             BroadcastNotificationRequest request = new BroadcastNotificationRequest(event.getId(), notification);
@@ -153,6 +153,7 @@ public class NotificationService
             Notification notification = new Notification.Builder(Notification.Type.RSVP)
                     .addParameter("event_id", event.getId())
                     .addParameter("event_name", event.getTitle())
+                    .addParameter("event_type", String.valueOf(event.getType()))
                     .addParameter("user_id", user.getId())
                     .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .build();

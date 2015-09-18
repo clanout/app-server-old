@@ -14,9 +14,9 @@ public class Notification
         EVENT_CREATED,
         EVENT_INVITATION,
         RSVP,
+        EVENT_REMOVED,
 
         EVENT_ADDED,
-        EVENT_REMOVED,
         EVENT_UPDATED,
         FRIEND_RELOCATED,
         BLOCKED,
