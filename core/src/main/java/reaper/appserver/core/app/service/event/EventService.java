@@ -236,6 +236,9 @@ public class EventService
     public Event update(String eventId, User user, String isFinalizedStr, String startTimeStr, String endTimeStr,
                         String locationLatitude, String locationLongitude, String locationName, String locationZone, String description)
     {
+        boolean isLocationUpdated = false;
+        boolean isTimeUpdated = false;
+
         List<String> chatUpdates = new ArrayList<>();
 
         if (eventId == null || eventId.isEmpty())
@@ -254,15 +257,10 @@ public class EventService
             throw new BadRequest("Cannot edit a finalized event");
         }
 
-        LOG.info("Finalization : " + isFinalizedStr);
-
         try
         {
             if (startTimeStr != null && endTimeStr != null)
             {
-
-                LOG.info("Received time edit\nStart Time: " + startTimeStr + "\nEnd Time: " + endTimeStr);
-
                 try
                 {
                     OffsetDateTime startTime = OffsetDateTime.parse(startTimeStr).atZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
@@ -271,6 +269,7 @@ public class EventService
                     event.setStartTime(startTime);
                     event.setEndTime(endTime);
 
+                    isTimeUpdated = true;
                     chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event timings");
                 }
                 catch (Exception e)
@@ -281,9 +280,6 @@ public class EventService
 
             if (locationZone != null)
             {
-                LOG.info("Received Location edit\nZone : " + locationZone + "\nName: " + locationName
-                        + "\nCo-ordinates : " + locationLongitude + "," + locationLatitude);
-
                 Event.Location location = event.getLocation();
                 location.setName(locationName);
                 location.setZone(locationZone);
@@ -310,6 +306,7 @@ public class EventService
                 }
                 event.setLocation(location);
 
+                isLocationUpdated = true;
                 chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event location");
             }
 
@@ -322,7 +319,7 @@ public class EventService
             }
 
             event = eventRepository.get(eventId, user);
-            notificationService.eventUpdated(user, event);
+            notificationService.eventUpdated(user, event, isLocationUpdated, isTimeUpdated);
             return event;
         }
         catch (BadRequest e)

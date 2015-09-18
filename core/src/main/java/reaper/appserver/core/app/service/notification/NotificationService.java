@@ -97,13 +97,16 @@ public class NotificationService
         }
     }
 
-    public void eventUpdated(User user, Event event)
+    public void eventUpdated(User user, Event event, boolean isLocationUpdated, boolean isTimeUpdated)
     {
         try
         {
             Notification notification = new Notification.Builder(Notification.Type.EVENT_UPDATED)
-                    .message(user.getFirstname() + " " + user.getLastname() + " updated the event '" + event.getTitle() + "'")
                     .addParameter("event_id", event.getId())
+                    .addParameter("event_name", event.getTitle())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
+                    .addParameter("is_location_updated", String.valueOf(isLocationUpdated))
+                    .addParameter("is_time_updated", String.valueOf(isTimeUpdated))
                     .build();
 
             BroadcastNotificationRequest request = new BroadcastNotificationRequest(event.getId(), notification);
@@ -143,7 +146,7 @@ public class NotificationService
 
     public void rsvpChanged(User user, Event event, Event.RSVP rsvp, Event.RSVP oldRsvp)
     {
-        if(rsvp == Event.RSVP.NO || oldRsvp != Event.RSVP.NO)
+        if (rsvp == Event.RSVP.NO || oldRsvp != Event.RSVP.NO)
         {
             return;
         }
