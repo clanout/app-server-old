@@ -12,6 +12,7 @@ import reaper.appserver.persistence.model.user.UserDetails;
 import reaper.appserver.persistence.model.user.UserRepository;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -20,21 +21,22 @@ public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        Gson gson = Converters.registerAll(new GsonBuilder()).setPrettyPrinting().create();
-
-        PostgreDatabaseAdapter postgreDatabaseAdapter = new PostgreDatabaseAdapter();
-        postgreDatabaseAdapter.init();
-
-        UserRepository userRepository = RepositoryFactory.create(User.class);
-        EventRepository eventRepository = RepositoryFactory.create(Event.class);
-
-        User user = userRepository.get("976303355745864");
-        System.out.println(user);
-
-        UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId());
-        System.out.println(gson.toJson(userDetails));
-
-        postgreDatabaseAdapter.close();
+        System.out.println(OffsetDateTime.now(ZoneOffset.UTC));
+//        Gson gson = Converters.registerAll(new GsonBuilder()).setPrettyPrinting().create();
+//
+//        PostgreDatabaseAdapter postgreDatabaseAdapter = new PostgreDatabaseAdapter();
+//        postgreDatabaseAdapter.init();
+//
+//        UserRepository userRepository = RepositoryFactory.create(User.class);
+//        EventRepository eventRepository = RepositoryFactory.create(Event.class);
+//
+//        User user = userRepository.get("976303355745864");
+//        System.out.println(user);
+//
+//        UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId());
+//        System.out.println(gson.toJson(userDetails));
+//
+//        postgreDatabaseAdapter.close();
     }
 
     public static Event create(User organizer)

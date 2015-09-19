@@ -395,11 +395,12 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setLong(2, userId);
             preparedStatement.setLong(3, userId);
             preparedStatement.setLong(4, userId);
-            preparedStatement.setString(5, zone);
-            preparedStatement.setLong(6, userId);
+            preparedStatement.setTimestamp(5, Timestamp.from(OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
+            preparedStatement.setString(6, zone);
             preparedStatement.setLong(7, userId);
             preparedStatement.setLong(8, userId);
             preparedStatement.setLong(9, userId);
+            preparedStatement.setLong(10, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())

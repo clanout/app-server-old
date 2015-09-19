@@ -52,7 +52,12 @@ FROM
     FROM event_invitees
     WHERE event_invitees.invitee_id = ?
   ) visible
-  INNER JOIN event_info a
+  INNER JOIN
+  (
+    SELECT *
+    FROM event_info
+    WHERE end_timestamp > ?
+  ) a
     ON visible.event_id = a.event_id
   INNER JOIN event_location b ON visible.event_id = b.event_id AND b.zone = ?
   INNER JOIN
