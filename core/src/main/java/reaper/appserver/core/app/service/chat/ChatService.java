@@ -1,5 +1,6 @@
 package reaper.appserver.core.app.service.chat;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
@@ -16,6 +17,7 @@ import org.jivesoftware.smackx.xdata.FormField;
 import reaper.appserver.config.ConfLoader;
 import reaper.appserver.config.ConfResource;
 import reaper.appserver.core.framework.exceptions.ServerError;
+import reaper.appserver.log.LogUtil;
 import reaper.appserver.persistence.model.user.User;
 
 import java.io.IOException;
@@ -25,6 +27,10 @@ import java.util.Map;
 
 public class ChatService
 {
+    private static final String TAG = "ChatService";
+
+    private static Logger LOG = LogUtil.getLogger(ChatService.class);
+
     private static String XMPP_SERVICE_NAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.service");
     private static String XMPP_HOST_NAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.host");
     private static int XMPP_PORT = Integer.parseInt(ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.port"));
@@ -35,45 +41,61 @@ public class ChatService
 
     private static String XMPP_CHATROOM_POSTFIX = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.chatroom_postfix");
 
-    private AbstractXMPPConnection getXMPPConnection() throws IOException, XMPPException, SmackException
+    private static AbstractXMPPConnection connection;
+
+    public ChatService()
     {
-        XMPPTCPConnectionConfiguration configuration = XMPPTCPConnectionConfiguration.builder()
-                .setUsernameAndPassword(ADMIN_USERNAME, ADMIN_PASSWORD)
-                .setServiceName(XMPP_SERVICE_NAME)
-                .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
-                .setHost(XMPP_HOST_NAME)
-                .setPort(XMPP_PORT)
-                .build();
+        synchronized (TAG)
+        {
+            try
+            {
+                XMPPTCPConnectionConfiguration configuration = XMPPTCPConnectionConfiguration.builder()
+                        .setUsernameAndPassword(ADMIN_USERNAME, ADMIN_PASSWORD)
+                        .setServiceName(XMPP_SERVICE_NAME)
+                        .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
+                        .setHost(XMPP_HOST_NAME)
+                        .setPort(XMPP_PORT)
+                        .build();
 
-        AbstractXMPPConnection connection = new XMPPTCPConnection(configuration);
-        connection.connect();
-        connection.login();
-
-        return connection;
+                connection = new XMPPTCPConnection(configuration);
+                connection.connect();
+                connection.login();
+            }
+            catch (Exception e)
+            {
+                LOG.error("Unable to open xmpp connection ", e);
+            }
+        }
     }
 
     public String createChatroom(String eventId)
     {
         try
         {
-            AbstractXMPPConnection connection = getXMPPConnection();
-
-            MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
-            MultiUserChat muc = manager.getMultiUserChat(eventId + XMPP_CHATROOM_POSTFIX);
-            muc.create(ADMIN_NICKNAME);
-
-            Form form = muc.getConfigurationForm();
-            Form submitForm = form.createAnswerForm();
-            List<FormField> fields = form.getFields();
-            for (FormField field : fields)
+            synchronized (TAG)
             {
-                if (!FormField.Type.hidden.equals(field.getType()) && field.getVariable() != null)
+                if (!connection.isConnected())
                 {
-                    submitForm.setDefaultAnswer(field.getVariable());
+                    connection.connect();
                 }
-                submitForm.setAnswer("muc#roomconfig_publicroom", true);
-                submitForm.setAnswer("muc#roomconfig_persistentroom", true);
-                muc.sendConfigurationForm(submitForm);
+
+                MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+                MultiUserChat muc = manager.getMultiUserChat(eventId + XMPP_CHATROOM_POSTFIX);
+                muc.create(ADMIN_NICKNAME);
+
+                Form form = muc.getConfigurationForm();
+                Form submitForm = form.createAnswerForm();
+                List<FormField> fields = form.getFields();
+                for (FormField field : fields)
+                {
+                    if (!FormField.Type.hidden.equals(field.getType()) && field.getVariable() != null)
+                    {
+                        submitForm.setDefaultAnswer(field.getVariable());
+                    }
+                    submitForm.setAnswer("muc#roomconfig_publicroom", true);
+                    submitForm.setAnswer("muc#roomconfig_persistentroom", true);
+                    muc.sendConfigurationForm(submitForm);
+                }
             }
 
             return eventId;
@@ -88,13 +110,21 @@ public class ChatService
     {
         try
         {
-            AccountManager accountManager = AccountManager.getInstance(getXMPPConnection());
-            accountManager.sensitiveOperationOverInsecureConnection(true);
+            synchronized (TAG)
+            {
+                if (!connection.isConnected())
+                {
+                    connection.connect();
+                }
 
-            Map<String, String> accountAttributes = new HashMap<>();
-            accountAttributes.put("name", user.getFirstname() + " " + user.getLastname());
+                AccountManager accountManager = AccountManager.getInstance(connection);
+                accountManager.sensitiveOperationOverInsecureConnection(true);
 
-            accountManager.createAccount(user.getId(), user.getId(), accountAttributes);
+                Map<String, String> accountAttributes = new HashMap<>();
+                accountAttributes.put("name", user.getFirstname() + " " + user.getLastname());
+
+                accountManager.createAccount(user.getId(), user.getId(), accountAttributes);
+            }
         }
         catch (Exception e)
         {
@@ -106,13 +136,20 @@ public class ChatService
     {
         try
         {
-            AbstractXMPPConnection connection = getXMPPConnection();
-            MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
-            MultiUserChat muc = manager.getMultiUserChat(eventId + XMPP_CHATROOM_POSTFIX);
+            synchronized (TAG)
+            {
+                if (!connection.isConnected())
+                {
+                    connection.connect();
+                }
 
-            muc.join(ADMIN_NICKNAME);
+                MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+                MultiUserChat muc = manager.getMultiUserChat(eventId + XMPP_CHATROOM_POSTFIX);
 
-            muc.sendMessage(message);
+                muc.join(ADMIN_NICKNAME);
+
+                muc.sendMessage(message);
+            }
         }
         catch (Exception e)
         {
@@ -123,7 +160,6 @@ public class ChatService
 
     public void readHistory(String eventId) throws XMPPException, IOException, SmackException
     {
-        AbstractXMPPConnection connection = getXMPPConnection();
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
         MultiUserChat muc = manager.getMultiUserChat(eventId + XMPP_CHATROOM_POSTFIX);
 
@@ -134,7 +170,8 @@ public class ChatService
         Message message = null;
         while ((message = muc.nextMessage()) != null)
         {
-            System.out.print(muc.getOccupant(message.getFrom()).getNick() + " : ");
+            String from = message.getFrom();
+            System.out.print(from + " : ");
             System.out.println(message.getBody());
         }
     }

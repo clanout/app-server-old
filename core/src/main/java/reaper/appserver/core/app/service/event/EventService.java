@@ -270,7 +270,7 @@ public class EventService
                     event.setEndTime(endTime);
 
                     isTimeUpdated = true;
-                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event timings");
+                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated timings");
                 }
                 catch (Exception e)
                 {
@@ -307,7 +307,7 @@ public class EventService
                 event.setLocation(location);
 
                 isLocationUpdated = true;
-                chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the event location");
+                chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the location");
             }
 
             eventRepository.update(event, user, description);
