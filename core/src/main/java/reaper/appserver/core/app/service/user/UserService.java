@@ -1,9 +1,12 @@
 package reaper.appserver.core.app.service.user;
 
+import org.apache.log4j.Logger;
 import reaper.appserver.core.app.service.chat.ChatService;
 import reaper.appserver.core.app.service.notification.NotificationService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
+import reaper.appserver.core.framework.util.GsonProvider;
+import reaper.appserver.log.LogUtil;
 import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.model.user.User;
 import reaper.appserver.persistence.model.user.UserDetails;
@@ -15,6 +18,8 @@ import java.util.Set;
 
 public class UserService
 {
+    private static Logger LOG = LogUtil.getLogger(UserService.class);
+
     private UserRepository userRepository;
     private NotificationService notificationService;
     private ChatService chatService;
@@ -26,7 +31,7 @@ public class UserService
         chatService = new ChatService();
     }
 
-    public void create(String userId, String username, String firstname, String lastname, String gender)
+    public void create(String userId, String username, String firstname, String lastname, String gender, List<String> friends)
     {
         if (userId == null || userId.isEmpty())
         {
@@ -79,6 +84,13 @@ public class UserService
         {
             throw new ServerError();
         }
+
+        LOG.info("[NEW USER] " + GsonProvider.getGson().toJson(user));
+
+        addFriends(user, friends);
+        LOG.info("[NEW USER - FRIENDS] " + GsonProvider.getGson().toJson(friends));
+
+        notificationService.newUser(user);
 
         chatService.createUser(user);
     }

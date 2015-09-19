@@ -18,7 +18,8 @@ public class Notification
         EVENT_UPDATED,
         BLOCKED,
         UNBLOCKED,
-        FRIEND_RELOCATED;
+        FRIEND_RELOCATED,
+        NEW_FRIEND;
     }
 
     private Notification(Type type)

@@ -63,6 +63,38 @@ public class NotificationService
         return response.getNotifications();
     }
 
+    public void newUser(User user)
+    {
+        try
+        {
+            Notification notification = new Notification.Builder(Notification.Type.NEW_FRIEND)
+                    .addParameter("user_id", user.getId())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
+                    .build();
+
+            Set<String> userIds = userRepository.getUserDetailsLocal(user.getId())
+                    .getFriends()
+                    .stream()
+                    .map(UserDetails.Friend::getId)
+                    .collect(Collectors.toSet());
+
+            MulticastNotificationRequest request = new MulticastNotificationRequest(userIds, notification);
+            Response response = api.send(request);
+            if (response.getStatus() != 200)
+            {
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
+            }
+            else
+            {
+                log.info("Notification sent for new user : " + GsonProvider.getGson().toJson(notification));
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Notification failed [" + e.getMessage() + "]");
+        }
+    }
+
     public void eventCreated(User user, Event event)
     {
         if (event.getType() == Event.Type.INVITE_ONLY)
