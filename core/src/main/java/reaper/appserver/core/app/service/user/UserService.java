@@ -80,15 +80,12 @@ public class UserService
         user.setRegistrationTime(OffsetDateTime.now());
         user.setStatus(User.Status.ACTIVE);
 
-        LOG.info("[NEW USER before create] " + GsonProvider.getGson().toJson(user));
-
         if (userRepository.create(user) == null)
         {
             throw new ServerError();
         }
 
         LOG.info("[NEW USER] " + GsonProvider.getGson().toJson(user));
-
         addFriends(user, friends);
         LOG.info("[NEW USER - FRIENDS] " + GsonProvider.getGson().toJson(friends));
 
