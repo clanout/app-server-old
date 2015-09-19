@@ -136,6 +136,7 @@ public class NotificationService
             Notification notification = new Notification.Builder(Notification.Type.EVENT_UPDATED)
                     .addParameter("event_id", event.getId())
                     .addParameter("event_name", event.getTitle())
+                    .addParameter("user_id", user.getId())
                     .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .addParameter("is_location_updated", String.valueOf(isLocationUpdated))
                     .addParameter("is_time_updated", String.valueOf(isTimeUpdated))
@@ -161,6 +162,7 @@ public class NotificationService
             Notification notification = new Notification.Builder(Notification.Type.EVENT_REMOVED)
                     .addParameter("event_id", event.getId())
                     .addParameter("event_name", event.getTitle())
+                    .addParameter("user_id", user.getId())
                     .build();
 
             BroadcastNotificationRequest request = new BroadcastNotificationRequest(event.getId(), notification);
