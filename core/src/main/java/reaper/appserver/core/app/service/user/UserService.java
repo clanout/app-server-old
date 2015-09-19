@@ -80,6 +80,8 @@ public class UserService
         user.setRegistrationTime(OffsetDateTime.now());
         user.setStatus(User.Status.ACTIVE);
 
+        LOG.info("[NEW USER before create] " + GsonProvider.getGson().toJson(user));
+
         if (userRepository.create(user) == null)
         {
             throw new ServerError();

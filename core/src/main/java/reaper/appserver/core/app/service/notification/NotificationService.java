@@ -72,7 +72,7 @@ public class NotificationService
                     .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .build();
 
-            Set<String> userIds = userRepository.getUserDetailsLocal(user.getId())
+            Set<String> userIds = userRepository.getUserDetails(user.getId())
                     .getFriends()
                     .stream()
                     .map(UserDetails.Friend::getId)
