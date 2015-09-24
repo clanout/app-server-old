@@ -19,7 +19,8 @@ public class Notification
         BLOCKED,
         UNBLOCKED,
         FRIEND_RELOCATED,
-        NEW_FRIEND;
+        NEW_FRIEND,
+        CHAT;
     }
 
     private Notification(Type type)

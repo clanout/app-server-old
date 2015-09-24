@@ -311,4 +311,26 @@ public class NotificationService
             log.error("Notification failed [" + e.getMessage() + "]");
         }
     }
+
+    public void chatUpdate(String eventId, String eventName)
+    {
+        try
+        {
+            Notification notification = new Notification.Builder(Notification.Type.CHAT)
+                    .addParameter("event_id", eventId)
+                    .addParameter("event_name", eventName)
+                    .build();
+
+            BroadcastNotificationRequest request = new BroadcastNotificationRequest(eventId, notification);
+            Response response = api.broadcast(request);
+            if (response.getStatus() != 200)
+            {
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Notification failed [" + e.getMessage() + "]");
+        }
+    }
 }

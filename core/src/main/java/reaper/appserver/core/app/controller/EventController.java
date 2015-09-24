@@ -192,4 +192,17 @@ public class EventController extends BaseController
 
         eventService.finalize(eventId, isFinalized, activeUser);
     }
+
+    public void chatAction()
+    {
+        String eventId = request.getData("event_id");
+        String eventName = request.getData("event_name");
+
+        if(eventId == null || eventId.isEmpty() || eventName == null || eventName.isEmpty())
+        {
+            throw new BadRequest("event_id/event_name cannot be null/empty");
+        }
+
+        eventService.chatUpdate(eventId, eventName);
+    }
 }

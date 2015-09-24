@@ -430,4 +430,9 @@ public class EventService
             chatService.postMessages(eventId, user.getFirstname() + " " + user.getLastname() + " has unlocked this event");
         }
     }
+
+    public void chatUpdate(String eventId, String eventName)
+    {
+        notificationService.chatUpdate(eventId, eventName);
+    }
 }
