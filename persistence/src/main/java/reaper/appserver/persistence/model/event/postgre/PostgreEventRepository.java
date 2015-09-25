@@ -32,6 +32,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     private static final String SQL_DELETE = PostgreQuery.load("event/delete.sql");
 
     private static final String SQL_CREATE_INVITATION = PostgreQuery.load("event/create_invitation.sql");
+    private static final String SQL_CREATE_PHONE_INVITATION = PostgreQuery.load("event/create_phone_invitation.sql");
 
     private static final String SQL_UPDATE_RSVP = PostgreQuery.load("event/update_rsvp.sql");
     private static final String SQL_DELETE_RSVP = PostgreQuery.load("event/delete_rsvp.sql");
@@ -636,7 +637,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setLong(4, Long.parseLong(event.getOrganizerId()));
             preparedStatement.setTimestamp(5, Timestamp.from(OffsetDateTime.now().atZoneSameInstant(ZoneOffset.UTC).toInstant()));
 
-            if(isFinalized)
+            if (isFinalized)
             {
                 preparedStatement.setString(6, String.valueOf(EventUpdate.FINALIZE));
             }
@@ -656,6 +657,48 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         {
             log.error("Unable to set event finalization [" + e.getMessage() + "]");
             return false;
+        }
+    }
+
+    @Override
+    public void createPhoneInvitations(String id, User from, List<String> phoneNumbers)
+    {
+        try
+        {
+            UUID eventId = null;
+            Long userId = null;
+            Timestamp createTimestamp = Timestamp.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant());
+
+            try
+            {
+                eventId = UUID.fromString(id);
+                userId = Long.parseLong(from.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id/user_id");
+            }
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE_PHONE_INVITATION);
+
+            for (String phoneNumber : phoneNumbers)
+            {
+                preparedStatement.setObject(1, eventId);
+                preparedStatement.setLong(2, userId);
+                preparedStatement.setTimestamp(3, createTimestamp);
+                preparedStatement.setString(4, phoneNumber);
+                preparedStatement.addBatch();
+            }
+
+            preparedStatement.executeBatch();
+
+            preparedStatement.close();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to create phone invitations from user_id = " + from.getId() + " for event_id = " + id + " [" + e.getMessage() + "]");
         }
     }
 

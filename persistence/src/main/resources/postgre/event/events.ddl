@@ -81,3 +81,11 @@ CREATE TABLE event_archive
   update_type TEXT,
   message     TEXT
 );
+
+CREATE TABLE event_phone_invitations
+(
+  event_id         UUID,
+  user_id          BIGINT REFERENCES user_info (user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  create_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+  phone            TEXT                     NOT NULL
+);

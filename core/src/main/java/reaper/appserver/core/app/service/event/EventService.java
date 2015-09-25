@@ -233,7 +233,18 @@ public class EventService
         notificationService.eventInvitation(user, invitedUsers, event);
     }
 
-    public Event update(String eventId, User user, String isFinalizedStr, String startTimeStr, String endTimeStr,
+    public void phoneInvitation(String eventId, User user, List<String> invitedUsers)
+    {
+        if (eventId == null || eventId.isEmpty())
+        {
+            throw new BadRequest("Cannot invite; invalid event_id");
+        }
+
+        eventRepository.createPhoneInvitations(eventId, user, invitedUsers);
+    }
+
+
+    public Event update(String eventId, User user, String startTimeStr, String endTimeStr,
                         String locationLatitude, String locationLongitude, String locationName, String locationZone, String description)
     {
         boolean isLocationUpdated = false;
@@ -416,7 +427,7 @@ public class EventService
             throw new BadRequest("only organizer can finalize/unfinalize an event");
         }
 
-        if(!eventRepository.setFinalizationState(event, isFinalized))
+        if (!eventRepository.setFinalizationState(event, isFinalized))
         {
             throw new ServerError("unable to finalize/unfinalize event");
         }

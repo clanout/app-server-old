@@ -112,7 +112,6 @@ public class EventController extends BaseController
     public void editAction()
     {
         String eventId = request.getData("event_id");
-        String isFinalized = request.getData("is_finalized");
         String startTime = request.getData("start_time");
         String endTime = request.getData("end_time");
         String locationLatitude = request.getData("location_latitude");
@@ -121,7 +120,7 @@ public class EventController extends BaseController
         String locationZone = request.getData("location_zone");
         String description = request.getData("description");
 
-        Event event = eventService.update(eventId, activeUser, isFinalized, startTime, endTime,
+        Event event = eventService.update(eventId, activeUser, startTime, endTime,
                 locationLatitude, locationLongitude, locationName, locationZone, description);
 
         response.set("event", event);
@@ -198,11 +197,38 @@ public class EventController extends BaseController
         String eventId = request.getData("event_id");
         String eventName = request.getData("event_name");
 
-        if(eventId == null || eventId.isEmpty() || eventName == null || eventName.isEmpty())
+        if (eventId == null || eventId.isEmpty() || eventName == null || eventName.isEmpty())
         {
             throw new BadRequest("event_id/event_name cannot be null/empty");
         }
 
         eventService.chatUpdate(eventId, eventName);
+    }
+
+    public void phoneInvitationAction()
+    {
+
+        String eventId = request.getData("event_id");
+        List<String> invitedUsers = null;
+
+        try
+        {
+            String inviteUsersJson = request.getData("phone_numbers");
+            Type type = new TypeToken<List<String>>()
+            {
+            }.getType();
+
+            invitedUsers = GsonProvider.getGson().fromJson(inviteUsersJson, type);
+            if (invitedUsers == null)
+            {
+                throw new NullPointerException();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("Invalid list<user_id> for inviting");
+        }
+
+        eventService.phoneInvitation(eventId, activeUser, invitedUsers);
     }
 }
