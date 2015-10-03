@@ -84,7 +84,7 @@ CREATE TABLE event_archive
 
 CREATE TABLE event_phone_invitations
 (
-  event_id         UUID,
+  event_id         UUID REFERENCES event_info(event_id) ON UPDATE CASCADE ON DELETE CASCADE,
   user_id          BIGINT REFERENCES user_info (user_id) ON UPDATE CASCADE ON DELETE CASCADE,
   create_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
   phone            TEXT                     NOT NULL

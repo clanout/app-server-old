@@ -107,6 +107,7 @@ public class NotificationService
             Notification notification = new Notification.Builder(Notification.Type.EVENT_CREATED)
                     .addParameter("event_id", event.getId())
                     .addParameter("event_name", event.getTitle())
+                    .addParameter("user_id", user.getId())
                     .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .build();
 
@@ -163,6 +164,7 @@ public class NotificationService
                     .addParameter("event_id", event.getId())
                     .addParameter("event_name", event.getTitle())
                     .addParameter("user_id", user.getId())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .build();
 
             BroadcastNotificationRequest request = new BroadcastNotificationRequest(event.getId(), notification);
@@ -193,6 +195,7 @@ public class NotificationService
                     .addParameter("event_type", String.valueOf(event.getType()))
                     .addParameter("user_id", user.getId())
                     .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
+                    .addParameter("user_rsvp", String.valueOf(rsvp))
                     .build();
 
             Set<String> userIds = userRepository.getUserDetailsLocal(user.getId())
@@ -221,6 +224,7 @@ public class NotificationService
             Notification notification = new Notification.Builder(Notification.Type.EVENT_INVITATION)
                     .addParameter("event_id", event.getId())
                     .addParameter("event_name", event.getTitle())
+                    .addParameter("user_id", from.getId())
                     .addParameter("user_name", from.getFirstname() + " " + from.getLastname())
                     .build();
 
@@ -245,7 +249,7 @@ public class NotificationService
         {
             Notification notification = new Notification.Builder(Notification.Type.FRIEND_RELOCATED)
                     .addParameter("user_id", user.getId())
-                    .addParameter("name", user.getFirstname() + " " + user.getLastname())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .addParameter("zone", newZone)
                     .build();
 
@@ -274,7 +278,7 @@ public class NotificationService
         {
             Notification notification = new Notification.Builder(Notification.Type.BLOCKED)
                     .addParameter("user_id", user.getId())
-                    .addParameter("name", user.getFirstname() + " " + user.getLastname())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .build();
 
             MulticastNotificationRequest request = new MulticastNotificationRequest(new HashSet<>(blockedIds), notification);
@@ -296,7 +300,7 @@ public class NotificationService
         {
             Notification notification = new Notification.Builder(Notification.Type.UNBLOCKED)
                     .addParameter("user_id", user.getId())
-                    .addParameter("name", user.getFirstname() + " " + user.getLastname())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .build();
 
             MulticastNotificationRequest request = new MulticastNotificationRequest(new HashSet<>(unblockedIds), notification);
