@@ -132,7 +132,7 @@ public class ChatService
         }
     }
 
-    private void postMessages(String eventId, String message)
+    public void postMessages(String eventId, String message)
     {
         try
         {
