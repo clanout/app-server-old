@@ -250,8 +250,6 @@ public class EventService
         boolean isLocationUpdated = false;
         boolean isTimeUpdated = false;
 
-        List<String> chatUpdates = new ArrayList<>();
-
         if (eventId == null || eventId.isEmpty())
         {
             throw new BadRequest("Cannot edit event; invalid event_id");
@@ -281,7 +279,6 @@ public class EventService
                     event.setEndTime(endTime);
 
                     isTimeUpdated = true;
-                    chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated timings");
                 }
                 catch (Exception e)
                 {
@@ -318,16 +315,9 @@ public class EventService
                 event.setLocation(location);
 
                 isLocationUpdated = true;
-                chatUpdates.add(user.getFirstname() + " " + user.getLastname() + " has updated the location");
             }
 
             eventRepository.update(event, user, description);
-
-            for (String chatUpdate : chatUpdates)
-            {
-                chatService.postMessages(event.getChatId(), chatUpdate);
-                LOG.info("Chat Message : " + chatUpdate);
-            }
 
             event = eventRepository.get(eventId, user);
             notificationService.eventUpdated(user, event, isLocationUpdated, isTimeUpdated);
@@ -430,15 +420,6 @@ public class EventService
         if (!eventRepository.setFinalizationState(event, isFinalized))
         {
             throw new ServerError("unable to finalize/unfinalize event");
-        }
-
-        if (isFinalized)
-        {
-            chatService.postMessages(eventId, user.getFirstname() + " " + user.getLastname() + " has finalized this event");
-        }
-        else
-        {
-            chatService.postMessages(eventId, user.getFirstname() + " " + user.getLastname() + " has unlocked this event");
         }
     }
 
