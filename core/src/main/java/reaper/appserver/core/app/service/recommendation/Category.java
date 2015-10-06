@@ -2,13 +2,13 @@ package reaper.appserver.core.app.service.recommendation;
 
 public enum Category
 {
-    GENERAL,
-    EAT_OUT,
-    DRINKS,
     CAFE,
     MOVIES,
+    SHOPPING,
+    SPORTS,
+    INDOORS,
+    EAT_OUT,
+    DRINKS,
     OUTDOORS,
-    PARTY,
-    LOCAL_EVENTS,
-    SHOPPING;
+    GENERAL;
 }

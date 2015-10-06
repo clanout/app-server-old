@@ -31,15 +31,13 @@ public class RecommendationService
 
         categoryMap.put(Category.GENERAL, new ArrayList<>());
         categoryMap.put(Category.EAT_OUT, Arrays.asList("food", "restaurant", "bar", "cafe", "bakery"));
-        categoryMap.put(Category.DRINKS, Arrays.asList("bar", "night_club", "restaurant"));
+        categoryMap.put(Category.DRINKS, Arrays.asList("bar", "night_club"));
         categoryMap.put(Category.CAFE, Arrays.asList("cafe"));
         categoryMap.put(Category.MOVIES, Arrays.asList("movie_theater"));
-        categoryMap.put(Category.OUTDOORS, Arrays.asList("amusement_park", "aquarium", "art_gallery", "bowling_alley",
-                "campground", "casino", "gym", "health", "library", "museum", "park", "spa", "stadium", "zoo"));
-        categoryMap.put(Category.PARTY, new ArrayList<>());
-        categoryMap.put(Category.LOCAL_EVENTS, new ArrayList<>());
-        categoryMap.put(Category.SHOPPING, Arrays.asList("shopping_mall", "clothing_store", "electronics_store",
-                "florist", "jewelry_store", "shoe_store"));
+        categoryMap.put(Category.OUTDOORS, new ArrayList<>());
+        categoryMap.put(Category.SPORTS, new ArrayList<>());
+        categoryMap.put(Category.INDOORS, new ArrayList<>());
+        categoryMap.put(Category.SHOPPING, Arrays.asList("shopping_mall", "clothing_store"));
     }
 
     public RecommendationService()
