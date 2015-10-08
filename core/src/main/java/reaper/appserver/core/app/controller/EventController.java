@@ -202,7 +202,7 @@ public class EventController extends BaseController
             throw new BadRequest("event_id/event_name cannot be null/empty");
         }
 
-        eventService.chatUpdate(eventId, eventName);
+        eventService.chatUpdate(activeUser, eventId, eventName);
     }
 
     public void phoneInvitationAction()

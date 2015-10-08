@@ -316,13 +316,14 @@ public class NotificationService
         }
     }
 
-    public void chatUpdate(String eventId, String eventName)
+    public void chatUpdate(User user, String eventId, String eventName)
     {
         try
         {
             Notification notification = new Notification.Builder(Notification.Type.CHAT)
                     .addParameter("event_id", eventId)
                     .addParameter("event_name", eventName)
+                    .addParameter("user_id", user.getId())
                     .build();
 
             BroadcastNotificationRequest request = new BroadcastNotificationRequest(eventId, notification);

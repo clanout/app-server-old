@@ -423,8 +423,8 @@ public class EventService
         }
     }
 
-    public void chatUpdate(String eventId, String eventName)
+    public void chatUpdate(User user, String eventId, String eventName)
     {
-        notificationService.chatUpdate(eventId, eventName);
+        notificationService.chatUpdate(user, eventId, eventName);
     }
 }
