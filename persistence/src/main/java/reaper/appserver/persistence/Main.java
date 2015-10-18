@@ -21,22 +21,20 @@ public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        System.out.println(OffsetDateTime.now(ZoneOffset.UTC));
-//        Gson gson = Converters.registerAll(new GsonBuilder()).setPrettyPrinting().create();
-//
-//        PostgreDatabaseAdapter postgreDatabaseAdapter = new PostgreDatabaseAdapter();
-//        postgreDatabaseAdapter.init();
-//
-//        UserRepository userRepository = RepositoryFactory.create(User.class);
-//        EventRepository eventRepository = RepositoryFactory.create(Event.class);
-//
-//        User user = userRepository.get("976303355745864");
-//        System.out.println(user);
-//
-//        UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId());
-//        System.out.println(gson.toJson(userDetails));
-//
-//        postgreDatabaseAdapter.close();
+//        System.out.println(OffsetDateTime.now(ZoneOffset.UTC));
+        Gson gson = Converters.registerAll(new GsonBuilder()).setPrettyPrinting().create();
+
+        PostgreDatabaseAdapter postgreDatabaseAdapter = new PostgreDatabaseAdapter();
+        postgreDatabaseAdapter.init();
+
+        UserRepository userRepository = RepositoryFactory.create(User.class);
+        EventRepository eventRepository = RepositoryFactory.create(Event.class);
+
+        User user = userRepository.get("10207377866064846");
+
+        System.out.println(gson.toJson(eventRepository.getDetails("542239ca-2323-4a2b-afa9-754f101741cb", user)));
+
+        postgreDatabaseAdapter.close();
     }
 
     public static Event create(User organizer)

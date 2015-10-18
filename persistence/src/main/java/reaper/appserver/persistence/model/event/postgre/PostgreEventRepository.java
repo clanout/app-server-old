@@ -11,7 +11,6 @@ import reaper.appserver.persistence.model.event.EventUpdate;
 import reaper.appserver.persistence.model.user.User;
 
 import java.sql.*;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -36,6 +35,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
     private static final String SQL_UPDATE_RSVP = PostgreQuery.load("event/update_rsvp.sql");
     private static final String SQL_DELETE_RSVP = PostgreQuery.load("event/delete_rsvp.sql");
+    private static final String SQL_UPDATE_STATUS = PostgreQuery.load("event/update_status.sql");
 
     public PostgreEventRepository()
     {
@@ -584,8 +584,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
                     {
                         throw new SQLException("Unable to process rsvp status");
                     }
-                    attendee.setFriend(resultSet.getBoolean("is_friend"));
-                    attendee.setInviter(resultSet.getBoolean("is_inviter"));
+                    attendee.setStatus(resultSet.getString("status"));
+                    attendee.setIsFriend(resultSet.getBoolean("is_friend"));
+                    attendee.setIsInviter(resultSet.getBoolean("is_inviter"));
 
                     attendees.add(attendee);
                 }
@@ -699,6 +700,41 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         catch (SQLException e)
         {
             log.error("Unable to create phone invitations from user_id = " + from.getId() + " for event_id = " + id + " [" + e.getMessage() + "]");
+        }
+    }
+
+    @Override
+    public void setStatus(String id, User user, String status)
+    {
+        try
+        {
+            UUID eventId = null;
+            Long userId = null;
+
+            try
+            {
+                eventId = UUID.fromString(id);
+                userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid event_id/user_id");
+            }
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_STATUS);
+
+            preparedStatement.setString(1, status);
+            preparedStatement.setObject(2, eventId);
+            preparedStatement.setLong(3, userId);
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to update status for user_id = " + user.getId() + " for event_id = " + id + " [" + e.getMessage() + "]");
         }
     }
 

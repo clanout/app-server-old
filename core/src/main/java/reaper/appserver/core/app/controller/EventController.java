@@ -207,7 +207,6 @@ public class EventController extends BaseController
 
     public void phoneInvitationAction()
     {
-
         String eventId = request.getData("event_id");
         List<String> invitedUsers = null;
 
@@ -230,5 +229,31 @@ public class EventController extends BaseController
         }
 
         eventService.phoneInvitation(eventId, activeUser, invitedUsers);
+    }
+
+    public void statusAction()
+    {
+        String eventId = request.getData("event_id");
+        String status = request.getData("status");
+
+        if (eventId == null || eventId.isEmpty() || status == null)
+        {
+            throw new BadRequest("event_id/status cannot be null");
+        }
+
+        eventService.setStatus(activeUser, eventId, status);
+    }
+
+    public void invitationResponseAction()
+    {
+        String eventId = request.getData("event_id");
+        String message = request.getData("message");
+
+        if (eventId == null || eventId.isEmpty() || message == null || message.isEmpty())
+        {
+            throw new BadRequest("event_id/message cannot be null/empty");
+        }
+
+        eventService.postInvitationResponse(activeUser, eventId, message);
     }
 }

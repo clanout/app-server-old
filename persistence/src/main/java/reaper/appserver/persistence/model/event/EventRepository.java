@@ -26,4 +26,6 @@ public interface EventRepository extends Repository<Event>
     boolean setFinalizationState(Event event, boolean isFinalized);
 
     void createPhoneInvitations(String id, User from, List<String> phoneNumbers);
+
+    void setStatus(String id, User user, String status);
 }

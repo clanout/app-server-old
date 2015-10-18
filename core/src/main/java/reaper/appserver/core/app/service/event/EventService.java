@@ -427,4 +427,15 @@ public class EventService
     {
         notificationService.chatUpdate(user, eventId, eventName);
     }
+
+    public void setStatus(User user, String eventId, String status)
+    {
+        eventRepository.setStatus(eventId, user, status);
+    }
+
+    public void postInvitationResponse(User user, String eventId, String message)
+    {
+        message = user.getFirstname() + " " + user.getLastname() + " " + message;
+        chatService.postMessages(eventId, message);
+    }
 }

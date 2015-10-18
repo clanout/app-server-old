@@ -86,6 +86,7 @@ public class EventDetails
         private String id;
         private String name;
         private Event.RSVP rsvp;
+        private String status;
         private boolean isFriend;
         private boolean isInviter;
 
@@ -119,12 +120,22 @@ public class EventDetails
             this.rsvp = rsvp;
         }
 
+        public String getStatus()
+        {
+            return status;
+        }
+
+        public void setStatus(String status)
+        {
+            this.status = status;
+        }
+
         public boolean isFriend()
         {
             return isFriend;
         }
 
-        public void setFriend(boolean isFriend)
+        public void setIsFriend(boolean isFriend)
         {
             this.isFriend = isFriend;
         }
@@ -134,7 +145,7 @@ public class EventDetails
             return isInviter;
         }
 
-        public void setInviter(boolean isInviter)
+        public void setIsInviter(boolean isInviter)
         {
             this.isInviter = isInviter;
         }

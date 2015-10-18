@@ -40,6 +40,7 @@ CREATE TABLE event_attendees
   event_id    UUID,
   attendee_id BIGINT,
   rsvp_status TEXT,
+  status      TEXT,
   CONSTRAINT event_attendees_attendee_id_fkey FOREIGN KEY (attendee_id)
   REFERENCES user_info (user_id) MATCH SIMPLE
   ON UPDATE CASCADE ON DELETE CASCADE,
@@ -84,7 +85,7 @@ CREATE TABLE event_archive
 
 CREATE TABLE event_phone_invitations
 (
-  event_id         UUID REFERENCES event_info(event_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  event_id         UUID REFERENCES event_info (event_id) ON UPDATE CASCADE ON DELETE CASCADE,
   user_id          BIGINT REFERENCES user_info (user_id) ON UPDATE CASCADE ON DELETE CASCADE,
   create_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
   phone            TEXT                     NOT NULL

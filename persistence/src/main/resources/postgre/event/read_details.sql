@@ -4,15 +4,19 @@
     attendees.attendee_id AS user_id,
     attendees.name,
     attendees.rsvp_status,
-    CASE WHEN friend_list.friend_id IS NOT NULL THEN TRUE
+    attendees.status,
+    CASE WHEN friend_list.friend_id IS NOT NULL
+      THEN TRUE
     ELSE FALSE END        AS is_friend,
-    CASE WHEN inviters.inviter_id IS NOT NULL THEN TRUE
+    CASE WHEN inviters.inviter_id IS NOT NULL
+      THEN TRUE
     ELSE FALSE END        AS is_inviter
   FROM
     (SELECT
        a.attendee_id,
        (b.firstname || ' ' || b.lastname) AS name,
-       a.rsvp_status
+       a.rsvp_status,
+       a.status
      FROM event_attendees a, user_info b
      WHERE event_id = ?
            AND a.attendee_id = b.user_id) AS attendees
@@ -46,6 +50,7 @@ UNION ALL
     a.invitee_id                       AS user_id,
     (b.firstname || ' ' || b.lastname) AS name,
     NULL                               AS rsvp_status,
+    NULL                               AS status,
     NULL                               AS is_friend,
     NULL                               AS is_inviter
   FROM event_invitees a, user_info b
