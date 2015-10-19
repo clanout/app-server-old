@@ -3,6 +3,7 @@ package reaper.appserver.core.app.service.event;
 import org.apache.log4j.Logger;
 import reaper.appserver.core.app.service.chat.ChatService;
 import reaper.appserver.core.app.service.notification.NotificationService;
+import reaper.appserver.core.app.service.sms.SmsService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
 import reaper.appserver.core.framework.exceptions.ServerError;
 import reaper.appserver.log.LogUtil;
@@ -25,12 +26,14 @@ public class EventService
     private EventRepository eventRepository;
     private ChatService chatService;
     private NotificationService notificationService;
+    private SmsService smsService;
 
     public EventService()
     {
         eventRepository = RepositoryFactory.create(Event.class);
         chatService = new ChatService();
         notificationService = new NotificationService();
+        smsService = new SmsService();
     }
 
     public Event getEvent(User user, String eventId)
@@ -240,7 +243,20 @@ public class EventService
             throw new BadRequest("Cannot invite; invalid event_id");
         }
 
+        Event event = eventRepository.get(eventId, user);
+        if (event == null)
+        {
+            throw new BadRequest("Cannot get event from event_id  = " + eventId);
+        }
+
         eventRepository.createPhoneInvitations(eventId, user, invitedUsers);
+
+        String inviterName = user.getFirstname();
+        for (String inviteeNumber : invitedUsers)
+        {
+            // TODO : validate phone number
+            smsService.sendInvitation(inviterName, inviteeNumber, event.getTitle());
+        }
     }
 
 
