@@ -235,13 +235,27 @@ public class EventController extends BaseController
     {
         String eventId = request.getData("event_id");
         String status = request.getData("status");
+        String notifyStr = request.getData("notification");
+        boolean notify = false;
 
         if (eventId == null || eventId.isEmpty() || status == null)
         {
             throw new BadRequest("event_id/status cannot be null");
         }
 
-        eventService.setStatus(activeUser, eventId, status);
+        try
+        {
+            if (notifyStr != null)
+            {
+                notify = Boolean.parseBoolean(notifyStr);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("Invalid notification parameter");
+        }
+
+        eventService.setStatus(activeUser, eventId, status, notify);
     }
 
     public void invitationResponseAction()
@@ -255,5 +269,12 @@ public class EventController extends BaseController
         }
 
         eventService.postInvitationResponse(activeUser, eventId, message);
+    }
+
+    public void pendingInvitationsAction()
+    {
+        String phone = request.getData("phone");
+        String zone = request.getData("zone");
+        eventService.fetchPendingInvitations(activeUser, phone, zone);
     }
 }

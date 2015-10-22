@@ -29,13 +29,11 @@ public class NotificationService
 
     private NotificationApi api;
     private UserRepository userRepository;
-    private EventRepository eventRepository;
 
     public NotificationService()
     {
         api = ApiManager.getApi();
         userRepository = RepositoryFactory.create(User.class);
-        eventRepository = RepositoryFactory.create(Event.class);
     }
 
     public void register(String userId, String token)
@@ -327,6 +325,31 @@ public class NotificationService
                     .build();
 
             BroadcastNotificationRequest request = new BroadcastNotificationRequest(eventId, notification);
+            Response response = api.broadcast(request);
+            if (response.getStatus() != 200)
+            {
+                log.error("Notification failed : " + GsonProvider.getGson().toJson(request));
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("Notification failed [" + e.getMessage() + "]");
+        }
+    }
+
+    public void statusUpdate(User user, Event event, String status)
+    {
+        try
+        {
+            Notification notification = new Notification.Builder(Notification.Type.STATUS)
+                    .addParameter("event_id", event.getId())
+                    .addParameter("event_name", event.getTitle())
+                    .addParameter("user_id", user.getId())
+                    .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
+                    .addParameter("status", status)
+                    .build();
+
+            BroadcastNotificationRequest request = new BroadcastNotificationRequest(event.getId(), notification);
             Response response = api.broadcast(request);
             if (response.getStatus() != 200)
             {

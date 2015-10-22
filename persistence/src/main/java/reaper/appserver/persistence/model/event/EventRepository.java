@@ -27,5 +27,7 @@ public interface EventRepository extends Repository<Event>
 
     void createPhoneInvitations(String id, User from, List<String> phoneNumbers);
 
+    void updatePendingInvitations(User user, String phone);
+
     void setStatus(String id, User user, String status);
 }

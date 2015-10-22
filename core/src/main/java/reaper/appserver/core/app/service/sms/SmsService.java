@@ -5,7 +5,6 @@ import reaper.appserver.config.ConfLoader;
 import reaper.appserver.config.ConfResource;
 import reaper.appserver.core.app.service.sms.api.ApiManager;
 import reaper.appserver.core.app.service.sms.api.SmsApi;
-import reaper.appserver.core.app.service.sms.api.SmsApiResponse;
 import reaper.appserver.log.LogUtil;
 
 public class SmsService
@@ -29,10 +28,8 @@ public class SmsService
     {
         try
         {
-            SmsApiResponse response = smsApi.sendBetaInvitation(SMS_SENDER_ID, SMS_USERNAME, SMS_PASSWORD,
+            smsApi.sendBetaInvitation(SMS_SENDER_ID, SMS_USERNAME, SMS_PASSWORD,
                     inviteeMobileNumber, "there", inviterName, eventTitle);
-
-            LOG.info(response.getResponseCode() + " : " + response.getMessage());
         }
         catch (Exception e)
         {

@@ -32,6 +32,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
     private static final String SQL_CREATE_INVITATION = PostgreQuery.load("event/create_invitation.sql");
     private static final String SQL_CREATE_PHONE_INVITATION = PostgreQuery.load("event/create_phone_invitation.sql");
+    private static final String SQL_UPDATE_PENDING_INVITATIONS = PostgreQuery.load("event/update_pending_invitations.sql");
 
     private static final String SQL_UPDATE_RSVP = PostgreQuery.load("event/update_rsvp.sql");
     private static final String SQL_DELETE_RSVP = PostgreQuery.load("event/delete_rsvp.sql");
@@ -700,6 +701,41 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         catch (SQLException e)
         {
             log.error("Unable to create phone invitations from user_id = " + from.getId() + " for event_id = " + id + " [" + e.getMessage() + "]");
+        }
+    }
+
+    @Override
+    public void updatePendingInvitations(User user, String phone)
+    {
+        try
+        {
+            Long userId = null;
+
+            try
+            {
+                userId = Long.parseLong(user.getId());
+            }
+            catch (Exception e)
+            {
+                throw new SQLException("Invalid user_id");
+            }
+
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_PENDING_INVITATIONS);
+
+            preparedStatement.setString(1, phone);
+            preparedStatement.setLong(2, userId);
+            preparedStatement.setLong(3, userId);
+            preparedStatement.setString(4, phone);
+            preparedStatement.setString(5, phone);
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to fetch pending invites for user_id = " + user.getId() + " [" + e.getMessage() + "]");
         }
     }
 

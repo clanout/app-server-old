@@ -30,9 +30,13 @@ public class Main
         UserRepository userRepository = RepositoryFactory.create(User.class);
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
-        User user = userRepository.get("10207377866064846");
+        User user = userRepository.get("976303355745864");
 
-        System.out.println(gson.toJson(eventRepository.getDetails("542239ca-2323-4a2b-afa9-754f101741cb", user)));
+        eventRepository.updatePendingInvitations(user, "+917022014321");
+
+//        eventRepository.createPhoneInvitations("dbdae453-dda6-4480-977e-ea0bb0539ab7", user, Arrays.asList("+917022014321"));
+
+//        System.out.println(gson.toJson(eventRepository.getDetails("542239ca-2323-4a2b-afa9-754f101741cb", user)));
 
         postgreDatabaseAdapter.close();
     }

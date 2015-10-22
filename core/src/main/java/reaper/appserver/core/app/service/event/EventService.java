@@ -444,14 +444,42 @@ public class EventService
         notificationService.chatUpdate(user, eventId, eventName);
     }
 
-    public void setStatus(User user, String eventId, String status)
+    public void setStatus(User user, String eventId, String status, boolean notify)
     {
         eventRepository.setStatus(eventId, user, status);
+
+        if (notify)
+        {
+            if (eventId == null || eventId.isEmpty())
+            {
+                throw new BadRequest("invalid event_id");
+            }
+
+            Event event = eventRepository.get(eventId, user);
+            if (event == null)
+            {
+                throw new BadRequest("Cannot get event from event_id  = " + eventId);
+            }
+
+            notificationService.statusUpdate(user, event, status);
+        }
     }
 
     public void postInvitationResponse(User user, String eventId, String message)
     {
         message = user.getFirstname() + " " + user.getLastname() + " " + message;
         chatService.postMessages(eventId, message);
+    }
+
+    public List<Event> fetchPendingInvitations(User user, String phone, String zone)
+    {
+        if (phone == null || phone.isEmpty())
+        {
+            throw new BadRequest("phone number cannot be null/empty");
+        }
+
+        eventRepository.updatePendingInvitations(user, phone);
+
+        return getEvents(user, zone);
     }
 }
