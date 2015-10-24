@@ -275,6 +275,7 @@ public class EventController extends BaseController
     {
         String phone = request.getData("phone");
         String zone = request.getData("zone");
-        eventService.fetchPendingInvitations(activeUser, phone, zone);
+        List<Event> events = eventService.fetchPendingInvitations(activeUser, phone, zone);
+        response.set("events", events);
     }
 }
