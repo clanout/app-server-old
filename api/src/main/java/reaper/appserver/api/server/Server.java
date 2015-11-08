@@ -24,10 +24,9 @@ public class Server
     private static Logger log = LogUtil.getLogger(Server.class);
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public String regularGet(@Context UriInfo uriInfo)
+    public Response regularGet()
     {
-        return "HelloWorld GET";
+        return Response.ok("SERVER HEALTHY").build();
     }
 
     @POST
