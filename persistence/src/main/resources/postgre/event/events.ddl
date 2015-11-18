@@ -90,3 +90,9 @@ CREATE TABLE event_phone_invitations
   create_timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
   phone            TEXT                     NOT NULL
 );
+
+CREATE TABLE event_suggestions
+(
+  title    TEXT NOT NULL,
+  category TEXT NOT NULL
+);

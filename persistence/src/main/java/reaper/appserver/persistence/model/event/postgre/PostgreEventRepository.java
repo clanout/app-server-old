@@ -4,10 +4,7 @@ import org.postgresql.geometric.PGpoint;
 import reaper.appserver.persistence.core.RepositoryActionNotAllowed;
 import reaper.appserver.persistence.core.postgre.AbstractPostgreRepository;
 import reaper.appserver.persistence.core.postgre.PostgreQuery;
-import reaper.appserver.persistence.model.event.Event;
-import reaper.appserver.persistence.model.event.EventDetails;
-import reaper.appserver.persistence.model.event.EventRepository;
-import reaper.appserver.persistence.model.event.EventUpdate;
+import reaper.appserver.persistence.model.event.*;
 import reaper.appserver.persistence.model.user.User;
 
 import java.sql.*;
@@ -37,6 +34,8 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     private static final String SQL_UPDATE_RSVP = PostgreQuery.load("event/update_rsvp.sql");
     private static final String SQL_DELETE_RSVP = PostgreQuery.load("event/delete_rsvp.sql");
     private static final String SQL_UPDATE_STATUS = PostgreQuery.load("event/update_status.sql");
+
+    private static final String SQL_READ_SUGGESTIONS = PostgreQuery.load("event/read_suggestions.sql");
 
     public PostgreEventRepository()
     {
@@ -771,6 +770,39 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         catch (SQLException e)
         {
             log.error("Unable to update status for user_id = " + user.getId() + " for event_id = " + id + " [" + e.getMessage() + "]");
+        }
+    }
+
+    @Override
+    public List<EventSuggestion> getSuggestions()
+    {
+        try
+        {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_STATUS);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<EventSuggestion> suggestions = new ArrayList<>();
+
+            while (resultSet.next())
+            {
+                EventSuggestion suggestion = new EventSuggestion();
+                suggestion.setTitle(resultSet.getString("title"));
+                suggestion.setCategory(resultSet.getString("category"));
+
+                suggestions.add(suggestion);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+            return suggestions;
+        }
+        catch (SQLException e)
+        {
+            log.error("Unable to fetch event suggestions [" + e.getMessage() + "]");
+            return new ArrayList<>();
         }
     }
 

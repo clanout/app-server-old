@@ -11,6 +11,7 @@ import reaper.appserver.persistence.core.RepositoryFactory;
 import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
 import reaper.appserver.persistence.model.event.EventRepository;
+import reaper.appserver.persistence.model.event.EventSuggestion;
 import reaper.appserver.persistence.model.user.User;
 import sun.rmi.runtime.Log;
 
@@ -481,5 +482,10 @@ public class EventService
         eventRepository.updatePendingInvitations(user, phone);
 
         return getEvents(user, zone);
+    }
+
+    public List<EventSuggestion> getSuggestions()
+    {
+        return eventRepository.getSuggestions();
     }
 }

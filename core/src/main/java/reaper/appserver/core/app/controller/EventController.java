@@ -139,6 +139,11 @@ public class EventController extends BaseController
         response.set("recommendations", recommendations);
     }
 
+    public void suggestionsAction()
+    {
+        response.set("event_suggestions", eventService.getSuggestions());
+    }
+
     public void updatesAction()
     {
         String zone = request.getData("zone");
