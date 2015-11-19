@@ -779,7 +779,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
         try
         {
             Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_STATUS);
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_SUGGESTIONS);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             List<EventSuggestion> suggestions = new ArrayList<>();
