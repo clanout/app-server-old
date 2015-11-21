@@ -33,6 +33,7 @@ public class Event implements Entity
     private RSVP rsvp;
     private int friendCount;
     private int inviterCount;
+    private List<String> friends;
 
     @Override
     public String getId()
@@ -189,6 +190,16 @@ public class Event implements Entity
     public void setInviterCount(int inviterCount)
     {
         this.inviterCount = inviterCount;
+    }
+
+    public List<String> getFriends()
+    {
+        return friends;
+    }
+
+    public void setFriends(List<String> friends)
+    {
+        this.friends = friends;
     }
 
     @Override
@@ -354,7 +365,7 @@ public class Event implements Entity
 
         private static class SerializerStrategy implements ExclusionStrategy
         {
-            private static List<String> excluded = Arrays.asList("rsvp", "friendCount", "inviterCount", "updateTime");
+            private static List<String> excluded = Arrays.asList("rsvp", "friendCount", "inviterCount", "updateTime", "friends");
 
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes)

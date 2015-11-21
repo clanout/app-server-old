@@ -11,6 +11,7 @@ import java.sql.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PostgreEventRepository extends AbstractPostgreRepository<Event> implements EventRepository
 {
@@ -21,6 +22,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     private static final String SQL_READ_VISIBLE = PostgreQuery.load("event/read_visible.sql");
     private static final String SQL_READ_DETAILS = PostgreQuery.load("event/read_details.sql");
     private static final String SQL_READ_DETAILS_DESCRIPTION = PostgreQuery.load("event/read_details_description.sql");
+    private static final String SQL_READ_FRIENDS_GOING = PostgreQuery.load("event/read_friends_going.sql");
 
     private static final String SQL_UPDATE = PostgreQuery.load("event/update.sql");
     private static final String SQL_UPDATE_FINALIZATION = PostgreQuery.load("event/update_finalization.sql");
@@ -83,10 +85,29 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
                 event = entityMapper.map(resultSet);
                 break;
             }
+            resultSet.close();
+            preparedStatement.close();
 
+            preparedStatement = connection.prepareStatement(SQL_READ_FRIENDS_GOING);
+            preparedStatement.setArray(1, connection.createArrayOf("uuid", new Object[]{eventId}));
+            preparedStatement.setLong(2, userId);
+            preparedStatement.setLong(3, userId);
+            resultSet = preparedStatement.executeQuery();
+
+            List<String> friends = new ArrayList<>();
+
+            while (resultSet.next())
+            {
+                if (friends.size() < 2)
+                {
+                    friends.add(resultSet.getString("firstname"));
+                }
+            }
             resultSet.close();
             preparedStatement.close();
             connection.close();
+
+            event.setFriends(friends);
         }
         catch (SQLException e)
         {
@@ -390,6 +411,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             }
 
             Connection connection = getConnection();
+
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_VISIBLE);
 
             preparedStatement.setLong(1, userId);
@@ -413,6 +435,44 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
             resultSet.close();
             preparedStatement.close();
+
+            List<String> eventIds = visibleEventsList.stream().map(Event::getId).collect(Collectors.toList());
+            Map<String, List<String>> friendsGoingMap = new HashMap<>();
+
+            preparedStatement = connection.prepareStatement(SQL_READ_FRIENDS_GOING);
+            preparedStatement.setArray(1, connection.createArrayOf("uuid", eventIds.toArray()));
+            preparedStatement.setLong(2, userId);
+            preparedStatement.setLong(3, userId);
+
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                String eventId = resultSet.getString("event_id");
+                List<String> fg = friendsGoingMap.get(eventId);
+                if (fg == null)
+                {
+                    fg = new ArrayList<>();
+                }
+
+                if (fg.size() < 2)
+                {
+                    fg.add(resultSet.getString("firstname"));
+                }
+                friendsGoingMap.put(eventId, fg);
+            }
+            resultSet.close();
+            preparedStatement.close();
+
+            for (int i = 0; i < eventIds.size(); i++)
+            {
+                List<String> fg = friendsGoingMap.get(eventIds.get(i));
+                if (fg == null)
+                {
+                    fg = new ArrayList<>();
+                }
+                visibleEventsList.get(i).setFriends(fg);
+            }
+
             connection.close();
         }
         catch (SQLException e)

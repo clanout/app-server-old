@@ -30,11 +30,11 @@ public class Main
         UserRepository userRepository = RepositoryFactory.create(User.class);
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
-//        User user = userRepository.get("976303355745864");
+        User user = userRepository.get("10207377866064846");
 //
 //        eventRepository.updatePendingInvitations(user, "+917022014321");
 
-        System.out.println(gson.toJson(eventRepository.getSuggestions()));
+        System.out.println(gson.toJson(eventRepository.get("3ac6efdf-f497-4934-89e1-8fbf0e3f8fe8", user)));
 
 //        eventRepository.createPhoneInvitations("dbdae453-dda6-4480-977e-ea0bb0539ab7", user, Arrays.asList("+917022014321"));
 
