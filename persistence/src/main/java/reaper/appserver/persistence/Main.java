@@ -31,6 +31,7 @@ public class Main
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
         User user = userRepository.get("10207377866064846");
+        System.out.println(gson.toJson(user));
 //
 //        eventRepository.updatePendingInvitations(user, "+917022014321");
 

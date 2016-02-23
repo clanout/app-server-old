@@ -20,6 +20,11 @@ public class MeController extends BaseController
         super(request, responseFactory);
     }
 
+    public void mainAction()
+    {
+        response.set("active_user", activeUser);
+    }
+
     public void friendsAction()
     {
         String zone = request.getData("zone");
