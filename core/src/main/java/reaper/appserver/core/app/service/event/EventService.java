@@ -2,6 +2,7 @@ package reaper.appserver.core.app.service.event;
 
 import org.apache.log4j.Logger;
 import reaper.appserver.core.app.service.chat.ChatService;
+import reaper.appserver.core.app.service.chat.Main;
 import reaper.appserver.core.app.service.notification.NotificationService;
 import reaper.appserver.core.app.service.sms.SmsService;
 import reaper.appserver.core.framework.exceptions.BadRequest;
@@ -13,12 +14,10 @@ import reaper.appserver.persistence.model.event.EventDetails;
 import reaper.appserver.persistence.model.event.EventRepository;
 import reaper.appserver.persistence.model.event.EventSuggestion;
 import reaper.appserver.persistence.model.user.User;
-import sun.rmi.runtime.Log;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class EventService
 {
@@ -472,16 +471,34 @@ public class EventService
         chatService.postMessages(eventId, message);
     }
 
-    public List<Event> fetchPendingInvitations(User user, String phone, String zone)
+    public Map<String, Object> fetchPendingInvitations(User user, String phone, String zone)
     {
         if (phone == null || phone.isEmpty())
         {
             throw new BadRequest("phone number cannot be null/empty");
         }
 
-        eventRepository.updatePendingInvitations(user, phone);
+        List<String> allInvites = eventRepository.processPendingInvitations(user, phone);
+        List<Event> allEvents = getEvents(user, zone);
 
-        return getEvents(user, zone);
+        List<Event> activeEvents = new ArrayList<>();
+        for (String eventId : allInvites)
+        {
+            Event event = new Event();
+            event.setId(eventId);
+
+            int index = allEvents.indexOf(event);
+            if (index != -1)
+            {
+                activeEvents.add(allEvents.get(index));
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", allInvites.size());
+        result.put("active_events", activeEvents);
+
+        return result;
     }
 
     public List<EventSuggestion> getSuggestions()

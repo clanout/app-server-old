@@ -14,6 +14,7 @@ import reaper.appserver.persistence.model.event.EventDetails;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 public class EventController extends BaseController
 {
@@ -280,7 +281,8 @@ public class EventController extends BaseController
     {
         String phone = request.getData("phone");
         String zone = request.getData("zone");
-        List<Event> events = eventService.fetchPendingInvitations(activeUser, phone, zone);
-        response.set("events", events);
+        Map<String, Object> result = eventService.fetchPendingInvitations(activeUser, phone, zone);
+        response.set("count", result.get("count"));
+        response.set("active_events", result.get("active_events"));
     }
 }

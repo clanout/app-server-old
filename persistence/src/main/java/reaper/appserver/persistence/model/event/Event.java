@@ -243,14 +243,7 @@ public class Event implements Entity
         else
         {
             Event other = (Event) o;
-            if (id.equals(other.id))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return id.equals(other.id);
         }
     }
 

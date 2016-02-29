@@ -30,7 +30,9 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     private static final String SQL_DELETE = PostgreQuery.load("event/delete.sql");
 
     private static final String SQL_CREATE_INVITATION = PostgreQuery.load("event/create_invitation.sql");
+
     private static final String SQL_CREATE_PHONE_INVITATION = PostgreQuery.load("event/create_phone_invitation.sql");
+    private static final String SQL_READ_PENDING_INVITATIONS = PostgreQuery.load("event/read_pending_invitations.sql");
     private static final String SQL_UPDATE_PENDING_INVITATIONS = PostgreQuery.load("event/update_pending_invitations.sql");
 
     private static final String SQL_UPDATE_RSVP = PostgreQuery.load("event/update_rsvp.sql");
@@ -764,10 +766,11 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     }
 
     @Override
-    public void updatePendingInvitations(User user, String phone)
+    public List<String> processPendingInvitations(User user, String phone)
     {
         try
         {
+            List<String> eventsInvited = new ArrayList<>();
             Long userId = null;
 
             try
@@ -780,8 +783,19 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             }
 
             Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_PENDING_INVITATIONS);
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_READ_PENDING_INVITATIONS);
+            preparedStatement.setString(1, phone);
 
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                String eventId = resultSet.getString("event_id");
+                eventsInvited.add(eventId);
+            }
+            resultSet.close();
+            preparedStatement.close();
+
+            preparedStatement = connection.prepareStatement(SQL_UPDATE_PENDING_INVITATIONS);
             preparedStatement.setString(1, phone);
             preparedStatement.setLong(2, userId);
             preparedStatement.setLong(3, userId);
@@ -791,10 +805,14 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.executeUpdate();
             preparedStatement.close();
             connection.close();
+
+            return eventsInvited;
         }
         catch (SQLException e)
         {
             log.error("Unable to fetch pending invites for user_id = " + user.getId() + " [" + e.getMessage() + "]");
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 
