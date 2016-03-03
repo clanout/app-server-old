@@ -336,9 +336,10 @@ public class EventService
             eventRepository.update(event, user, description);
             event = eventRepository.get(eventId, user);
 
+            String userName = user.getFirstname() + " " + user.getLastname();
             if (isTimeUpdated)
             {
-                chatService.postMessages(eventId, "start_time:" + event.getStartTime().toString());
+                chatService.postMessages(eventId, "start_time:" + userName + ":" + event.getStartTime().toString());
             }
 
             if (isLocationUpdated)
@@ -347,11 +348,11 @@ public class EventService
                 String locName = location.getName();
                 if (locName != null)
                 {
-                    chatService.postMessages(eventId, "location:" + locName);
+                    chatService.postMessages(eventId, "location:" + userName + ":" + locName);
                 }
                 else
                 {
-                    chatService.postMessages(eventId, "location:0");
+                    chatService.postMessages(eventId, "location:" + userName + ":0");
                 }
             }
 
