@@ -346,7 +346,7 @@ public class EventService
             {
                 Event.Location location = event.getLocation();
                 String locName = location.getName();
-                if (locName != null)
+                if (locName != null && !locName.isEmpty())
                 {
                     chatService.postMessages(eventId, "location:" + userName + ":" + locName);
                 }
