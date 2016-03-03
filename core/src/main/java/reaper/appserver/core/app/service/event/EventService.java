@@ -334,8 +334,27 @@ public class EventService
             }
 
             eventRepository.update(event, user, description);
-
             event = eventRepository.get(eventId, user);
+
+            if (isTimeUpdated)
+            {
+                chatService.postMessages(eventId, "start_time:" + event.getStartTime().toString());
+            }
+
+            if (isLocationUpdated)
+            {
+                Event.Location location = event.getLocation();
+                String locName = location.getName();
+                if (locName != null)
+                {
+                    chatService.postMessages(eventId, "location:" + locName);
+                }
+                else
+                {
+                    chatService.postMessages(eventId, "location:0");
+                }
+            }
+
             notificationService.eventUpdated(user, event, isLocationUpdated, isTimeUpdated);
             return event;
         }
@@ -467,7 +486,7 @@ public class EventService
 
     public void postInvitationResponse(User user, String eventId, String message)
     {
-        message = user.getFirstname() + " " + user.getLastname() + " " + message;
+        message = "invitation_response:" + user.getFirstname() + " " + user.getLastname() + ":" + message;
         chatService.postMessages(eventId, message);
     }
 

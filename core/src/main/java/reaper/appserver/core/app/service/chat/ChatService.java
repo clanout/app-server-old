@@ -17,10 +17,12 @@ import org.jivesoftware.smackx.xdata.FormField;
 import reaper.appserver.config.ConfLoader;
 import reaper.appserver.config.ConfResource;
 import reaper.appserver.core.framework.exceptions.ServerError;
+import reaper.appserver.core.framework.util.GsonProvider;
 import reaper.appserver.log.LogUtil;
 import reaper.appserver.persistence.model.user.User;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ public class ChatService
     private static String ADMIN_USERNAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.username");
     private static String ADMIN_PASSWORD = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.password");
     private static String ADMIN_NICKNAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.nickname");
+    private static String ADMIN_USER_ID = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.user_id");
 
     private static String XMPP_CHATROOM_POSTFIX = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.chatroom_postfix");
 
@@ -148,7 +151,14 @@ public class ChatService
 
                 muc.join(ADMIN_NICKNAME);
 
-                muc.sendMessage(message);
+                Map<String, String> chatMessage = new HashMap<>();
+                chatMessage.put("id", (eventId + "_" + System.nanoTime()));
+                chatMessage.put("message", message);
+                chatMessage.put("senderName", ADMIN_NICKNAME);
+                chatMessage.put("senderId", ADMIN_USER_ID);
+                chatMessage.put("timestamp", OffsetDateTime.now().toString());
+
+                muc.sendMessage(GsonProvider.getGson().toJson(chatMessage));
             }
         }
         catch (Exception e)
