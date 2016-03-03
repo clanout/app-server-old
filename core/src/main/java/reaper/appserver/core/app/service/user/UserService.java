@@ -190,17 +190,20 @@ public class UserService
         userRepository.setPhone(user, phone);
     }
 
-    public void setLocation(User user, String zone)
+    public boolean setLocation(User user, String zone)
     {
         if (zone == null || zone.isEmpty())
         {
             throw new BadRequest("user location cannot be null/empty");
         }
 
-        if (userRepository.updateLocation(user, zone))
+        boolean isRelocated = userRepository.updateLocation(user, zone);
+        if (isRelocated)
         {
             notificationService.userRelocated(user, zone);
         }
+
+        return isRelocated;
     }
 
     public void addFriends(User user, List<String> userIds)

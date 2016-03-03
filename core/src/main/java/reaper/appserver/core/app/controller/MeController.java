@@ -146,7 +146,8 @@ public class MeController extends BaseController
     public void locationAction()
     {
         String zone = request.getData("zone");
-        userService.setLocation(activeUser, zone);
+        boolean isRelocated = userService.setLocation(activeUser, zone);
+        response.set("is_relocated", isRelocated);
     }
 
     public void addFriendsAction()
