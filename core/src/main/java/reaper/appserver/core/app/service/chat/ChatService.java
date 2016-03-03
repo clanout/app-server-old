@@ -158,6 +158,8 @@ public class ChatService
                 chatMessage.put("senderId", ADMIN_USER_ID);
                 chatMessage.put("timestamp", OffsetDateTime.now().toString());
 
+                LOG.info("[Admin Chat]" + GsonProvider.getGson().toJson(chatMessage));
+
                 muc.sendMessage(GsonProvider.getGson().toJson(chatMessage));
             }
         }
