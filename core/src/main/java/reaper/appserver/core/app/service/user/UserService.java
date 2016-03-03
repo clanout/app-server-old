@@ -13,7 +13,9 @@ import reaper.appserver.persistence.model.user.UserDetails;
 import reaper.appserver.persistence.model.user.UserRepository;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class UserService
@@ -99,20 +101,32 @@ public class UserService
         return userRepository.get(userId);
     }
 
-    public Set<UserDetails.Friend> getFriends(User user)
+    public Map<String, Set<UserDetails.Friend>> getFriends(User user)
     {
         UserDetails userDetails = userRepository.getUserDetails(user.getId());
         if (userDetails == null)
         {
             throw new ServerError("Unable to fetch friends for user_id = " + user.getId());
         }
+        Set<UserDetails.Friend> allFriends = userDetails.getFriends();
+        Set<UserDetails.Friend> localFriends = getLocalFriends(user);
 
-        Set<UserDetails.Friend> friends = userDetails.getFriends();
+        for (UserDetails.Friend localFriend : localFriends)
+        {
+            if (allFriends.contains(localFriend))
+            {
+                allFriends.remove(localFriend);
+            }
+        }
+
+        Map<String, Set<UserDetails.Friend>> friends = new HashMap<>();
+        friends.put("local_friends", localFriends);
+        friends.put("other_friends", allFriends);
 
         return friends;
     }
 
-    public Set<UserDetails.Friend> getLocalFriends(User user, String zone)
+    public Set<UserDetails.Friend> getLocalFriends(User user)
     {
         UserDetails userDetails = userRepository.getUserDetailsLocal(user.getId());
         if (userDetails == null)

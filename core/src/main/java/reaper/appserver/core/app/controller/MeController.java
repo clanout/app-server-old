@@ -11,6 +11,7 @@ import reaper.appserver.persistence.model.user.UserDetails;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MeController extends BaseController
@@ -31,13 +32,14 @@ public class MeController extends BaseController
 
         if (zone == null)
         {
-            Set<UserDetails.Friend> friends = userService.getFriends(activeUser);
-            response.set("friends", friends);
+            Map<String, Set<UserDetails.Friend>> friends = userService.getFriends(activeUser);
+            response.set("local_friends", friends.get("local_friends"));
+            response.set("other_friends", friends.get("other_friends"));
         }
         else
         {
-            Set<UserDetails.Friend> localFriends = userService.getLocalFriends(activeUser, zone);
-            response.set("friends", localFriends);
+            Set<UserDetails.Friend> localFriends = userService.getLocalFriends(activeUser);
+            response.set("local_friends", localFriends);
         }
     }
 
