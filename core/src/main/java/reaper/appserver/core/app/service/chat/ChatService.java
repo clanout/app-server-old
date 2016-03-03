@@ -40,7 +40,6 @@ public class ChatService
     private static String ADMIN_USERNAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.username");
     private static String ADMIN_PASSWORD = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.password");
     private static String ADMIN_NICKNAME = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.nickname");
-    private static String ADMIN_USER_ID = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.admin.user_id");
 
     private static String XMPP_CHATROOM_POSTFIX = ConfLoader.getConf(ConfResource.CHAT).get("chat.xmpp.chatroom_postfix");
 
@@ -155,7 +154,7 @@ public class ChatService
                 chatMessage.put("id", (eventId + "_" + System.nanoTime()));
                 chatMessage.put("message", message);
                 chatMessage.put("senderName", ADMIN_NICKNAME);
-                chatMessage.put("senderId", ADMIN_USER_ID);
+                chatMessage.put("senderId", ADMIN_NICKNAME);
                 chatMessage.put("timestamp", OffsetDateTime.now().toString());
 
                 LOG.info("[Admin Chat]" + GsonProvider.getGson().toJson(chatMessage));
