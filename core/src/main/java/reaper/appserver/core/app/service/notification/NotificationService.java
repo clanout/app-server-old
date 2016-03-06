@@ -18,6 +18,7 @@ import reaper.appserver.persistence.model.user.UserDetails;
 import reaper.appserver.persistence.model.user.UserRepository;
 import retrofit.client.Response;
 
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -314,7 +315,7 @@ public class NotificationService
         }
     }
 
-    public void chatUpdate(User user, String eventId, String eventName)
+    public void chatUpdate(User user, String eventId, String eventName, OffsetDateTime timestamp)
     {
         try
         {
@@ -322,6 +323,7 @@ public class NotificationService
                     .addParameter("event_id", eventId)
                     .addParameter("event_name", eventName)
                     .addParameter("user_id", user.getId())
+                    .addParameter("timestamp", timestamp.toString())
                     .build();
 
             BroadcastNotificationRequest request = new BroadcastNotificationRequest(eventId, notification);

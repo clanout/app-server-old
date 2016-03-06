@@ -459,9 +459,9 @@ public class EventService
         }
     }
 
-    public void chatUpdate(User user, String eventId, String eventName)
+    public void chatUpdate(User user, String eventId, String eventName, OffsetDateTime timestamp)
     {
-        notificationService.chatUpdate(user, eventId, eventName);
+        notificationService.chatUpdate(user, eventId, eventName, timestamp);
     }
 
     public void setStatus(User user, String eventId, String status, boolean notify)

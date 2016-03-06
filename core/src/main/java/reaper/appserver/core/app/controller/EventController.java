@@ -13,6 +13,7 @@ import reaper.appserver.persistence.model.event.Event;
 import reaper.appserver.persistence.model.event.EventDetails;
 
 import java.lang.reflect.Type;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -202,13 +203,24 @@ public class EventController extends BaseController
     {
         String eventId = request.getData("event_id");
         String eventName = request.getData("event_name");
+        String timestamp = request.getData("last_sent_timestamp");
 
         if (eventId == null || eventId.isEmpty() || eventName == null || eventName.isEmpty())
         {
             throw new BadRequest("event_id/event_name cannot be null/empty");
         }
 
-        eventService.chatUpdate(activeUser, eventId, eventName);
+        OffsetDateTime lastSentTimestamp = null;
+        try
+        {
+            lastSentTimestamp = OffsetDateTime.parse(timestamp);
+        }
+        catch (Exception e)
+        {
+            throw new BadRequest("invalid timestamp");
+        }
+
+        eventService.chatUpdate(activeUser, eventId, eventName, lastSentTimestamp);
     }
 
     public void phoneInvitationAction()
