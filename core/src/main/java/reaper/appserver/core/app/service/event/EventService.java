@@ -221,6 +221,11 @@ public class EventService
 
         eventRepository.setRSVP(eventId, user, rsvp);
         notificationService.rsvpChanged(user, event, rsvp, oldRsvp);
+
+        if (oldRsvp != rsvp)
+        {
+            chatService.postMessages(eventId, "rsvp:" + (user.getFirstname() + " " + user.getLastname()) + ":" + rsvp);
+        }
     }
 
     public void invite(String eventId, User user, List<String> invitedUsers)
