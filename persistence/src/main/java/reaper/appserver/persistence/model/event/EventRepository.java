@@ -9,9 +9,9 @@ public interface EventRepository extends Repository<Event>
 {
     Event get(String id, User user);
 
-    String create(Event event, String description);
+    String create(Event event);
 
-    void update(Event event, User user, String description);
+    void update(Event event, User user);
 
     void remove(Event event, User user);
 

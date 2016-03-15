@@ -108,7 +108,6 @@ public class EventController extends BaseController
         }
 
         eventService.invite(eventId, activeUser, invitedUsers);
-
     }
 
     public void editAction()

@@ -16,7 +16,8 @@ SELECT
   d.rsvp_status,
   e.attendee_count,
   f.inviter_count,
-  g.friend_count
+  g.friend_count,
+  h.description     AS description
 FROM
   (
     SELECT *
@@ -39,6 +40,13 @@ FROM
     LIMIT 1
   ) c
     ON a.event_id = c.event_id
+  INNER JOIN
+  (
+    SELECT *
+    FROM event_description
+    WHERE event_id = ?
+  ) h
+    ON a.event_id = h.event_id
   LEFT JOIN
   (
     SELECT *

@@ -73,13 +73,14 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setObject(2, eventId);
             preparedStatement.setObject(3, eventId);
             preparedStatement.setObject(4, eventId);
-            preparedStatement.setLong(5, userId);
-            preparedStatement.setObject(6, eventId);
+            preparedStatement.setObject(5, eventId);
+            preparedStatement.setLong(6, userId);
             preparedStatement.setObject(7, eventId);
-            preparedStatement.setLong(8, userId);
+            preparedStatement.setObject(8, eventId);
             preparedStatement.setLong(9, userId);
             preparedStatement.setLong(10, userId);
-            preparedStatement.setObject(11, eventId);
+            preparedStatement.setLong(11, userId);
+            preparedStatement.setObject(12, eventId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
@@ -90,26 +91,31 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             resultSet.close();
             preparedStatement.close();
 
-            preparedStatement = connection.prepareStatement(SQL_READ_FRIENDS_GOING);
-            preparedStatement.setArray(1, connection.createArrayOf("uuid", new Object[]{eventId}));
-            preparedStatement.setLong(2, userId);
-            preparedStatement.setLong(3, userId);
-            resultSet = preparedStatement.executeQuery();
-
-            List<String> friends = new ArrayList<>();
-
-            while (resultSet.next())
+            if (event != null)
             {
-                if (friends.size() < 2)
+                preparedStatement = connection.prepareStatement(SQL_READ_FRIENDS_GOING);
+                preparedStatement.setArray(1, connection.createArrayOf("uuid", new Object[]{eventId}));
+                preparedStatement.setLong(2, userId);
+                preparedStatement.setLong(3, userId);
+                resultSet = preparedStatement.executeQuery();
+
+                List<String> friends = new ArrayList<>();
+
+                while (resultSet.next())
                 {
                     friends.add(resultSet.getString("firstname"));
+                    if (friends.size() == 2)
+                    {
+                        break;
+                    }
                 }
-            }
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
+                event.setFriends(friends);
 
-            event.setFriends(friends);
+                resultSet.close();
+                preparedStatement.close();
+
+            }
+            connection.close();
         }
         catch (SQLException e)
         {
@@ -120,7 +126,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     }
 
     @Override
-    public String create(Event event, String description)
+    public String create(Event event)
     {
         Connection connection = null;
 
@@ -200,6 +206,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
             // Description
             preparedStatement.setObject(5, eventId);
+            String description = event.getDescription();
             if (description == null)
             {
                 description = "";
@@ -251,7 +258,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
     }
 
     @Override
-    public void update(Event event, User user, String description)
+    public void update(Event event, User user)
     {
         Connection connection = null;
 
@@ -300,7 +307,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setString(8, location.getZone());
             preparedStatement.setObject(9, eventId);
 
-            preparedStatement.setString(10, description);
+            preparedStatement.setString(10, event.getDescription());
             preparedStatement.setObject(11, eventId);
 
             preparedStatement.setObject(12, eventId);
@@ -886,12 +893,6 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
 
     @Override
     public Event get(String id)
-    {
-        throw new RepositoryActionNotAllowed();
-    }
-
-    @Override
-    public String create(Event entity)
     {
         throw new RepositoryActionNotAllowed();
     }

@@ -129,7 +129,7 @@ public class NotificationService
         }
     }
 
-    public void eventUpdated(User user, Event event, boolean isLocationUpdated, boolean isTimeUpdated)
+    public void eventUpdated(User user, Event event, boolean isLocationUpdated, boolean isTimeUpdated, boolean isDescriptionUpdated)
     {
         try
         {
@@ -140,6 +140,7 @@ public class NotificationService
                     .addParameter("user_name", user.getFirstname() + " " + user.getLastname())
                     .addParameter("is_location_updated", String.valueOf(isLocationUpdated))
                     .addParameter("is_time_updated", String.valueOf(isTimeUpdated))
+                    .addParameter("is_description_updated", String.valueOf(isDescriptionUpdated))
                     .build();
 
             BroadcastNotificationRequest request = new BroadcastNotificationRequest(event.getId(), notification);

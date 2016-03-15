@@ -16,7 +16,8 @@ SELECT
   d.rsvp_status,
   e.attendee_count,
   f.inviter_count,
-  g.friend_count
+  g.friend_count,
+  h.description     AS description
 FROM
   (
     SELECT DISTINCT events_of_friends.event_id
@@ -69,6 +70,12 @@ FROM
     GROUP BY event_id
   ) c
     ON visible.event_id = c.event_id
+  INNER JOIN
+  (
+    SELECT *
+    FROM event_description
+  ) h
+    ON visible.event_id = h.event_id
   LEFT JOIN
   (
     SELECT *

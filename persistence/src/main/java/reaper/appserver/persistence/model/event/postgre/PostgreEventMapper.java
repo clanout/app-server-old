@@ -51,7 +51,7 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         double latitude = resultSet.getDouble("latitude");
         double longitude = resultSet.getDouble("longitude");
 
-        if(latitude == -1000.0 || longitude == -1000.0)
+        if (latitude == -1000.0 || longitude == -1000.0)
         {
             location.setLatitude(null);
             location.setLongitude(null);
@@ -99,6 +99,8 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
         {
             throw new SQLException("Unable to process create_time (timestamp)");
         }
+
+        event.setDescription(resultSet.getString("description"));
 
         return event;
     }

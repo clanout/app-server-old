@@ -138,8 +138,9 @@ public class EventService
             event.setEndTime(endTime);
             event.setOrganizerId(user.getId());
             event.setLocation(location);
+            event.setDescription(description);
 
-            String eventId = eventRepository.create(event, description);
+            String eventId = eventRepository.create(event);
             if (eventId == null)
             {
                 throw new ServerError("Unable to create event; user_id = " + user.getId());
@@ -270,6 +271,7 @@ public class EventService
     {
         boolean isLocationUpdated = false;
         boolean isTimeUpdated = false;
+        boolean isDescriptionUpdated = false;
 
         if (eventId == null || eventId.isEmpty())
         {
@@ -338,7 +340,13 @@ public class EventService
                 isLocationUpdated = true;
             }
 
-            eventRepository.update(event, user, description);
+            if (description != null)
+            {
+                event.setDescription(description);
+                isDescriptionUpdated = true;
+            }
+
+            eventRepository.update(event, user);
             event = eventRepository.get(eventId, user);
 
             String userName = user.getFirstname() + " " + user.getLastname();
@@ -361,7 +369,19 @@ public class EventService
                 }
             }
 
-            notificationService.eventUpdated(user, event, isLocationUpdated, isTimeUpdated);
+            if (isDescriptionUpdated)
+            {
+                if (description.isEmpty())
+                {
+                    chatService.postMessages(eventId, "description:" + userName + ":0");
+                }
+                else
+                {
+                    chatService.postMessages(eventId, "description:" + userName + ":" + description);
+                }
+            }
+
+            notificationService.eventUpdated(user, event, isLocationUpdated, isTimeUpdated, isDescriptionUpdated);
             return event;
         }
         catch (BadRequest e)

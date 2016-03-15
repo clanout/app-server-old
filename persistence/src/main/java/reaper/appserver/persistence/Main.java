@@ -21,7 +21,6 @@ public class Main
 {
     public static void main(String[] args) throws Exception
     {
-//        System.out.println(OffsetDateTime.now(ZoneOffset.UTC));
         Gson gson = Converters.registerAll(new GsonBuilder()).setPrettyPrinting().create();
 
         PostgreDatabaseAdapter postgreDatabaseAdapter = new PostgreDatabaseAdapter();
@@ -30,19 +29,8 @@ public class Main
         UserRepository userRepository = RepositoryFactory.create(User.class);
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
-        User gaurav = userRepository.get("976303355745864");
-
         User aditya = userRepository.getFromUsername("aytida77@gmail.com");
-
-//        eventRepository.createPhoneInvitations("0ca7affe-d3d0-4d34-aeb6-35d2059d32f6", gaurav, Arrays.asList("+917760747507"));
-//        eventRepository.createPhoneInvitations("1ca7affe-d3d0-4d34-aeb6-35d2059d32f6", gaurav, Arrays.asList("+917760747507"));
-//        System.out.println(gson.toJson(eventRepository.processPendingInvitations(aditya, "+917760747507")));
-//
-//        eventRepository.processPendingInvitations(user, "+917022014321");
-
-//        eventRepository.createPhoneInvitations("dbdae453-dda6-4480-977e-ea0bb0539ab7", user, Arrays.asList("+917022014321"));
-
-//        System.out.println(gson.toJson(eventRepository.getDetails("542239ca-2323-4a2b-afa9-754f101741cb", user)));
+        System.out.println(gson.toJson(eventRepository.getVisibleEvents(aditya, "Bengaluru")));
 
         postgreDatabaseAdapter.close();
     }

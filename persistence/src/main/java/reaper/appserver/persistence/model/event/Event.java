@@ -18,12 +18,12 @@ public class Event implements Entity
     private String title;
     private Type type;
     private String category;
-    private String chatId;
 
     private boolean isFinalized;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
     private Location location;
+    private String description;
 
     private int attendeeCount;
 
@@ -44,7 +44,6 @@ public class Event implements Entity
     public void setId(String id)
     {
         this.id = id;
-        this.chatId = id;
     }
 
     public String getOrganizerId()
@@ -137,11 +136,6 @@ public class Event implements Entity
         this.attendeeCount = attendeeCount;
     }
 
-    public String getChatId()
-    {
-        return chatId;
-    }
-
     public OffsetDateTime getCreateTime()
     {
         return createTime;
@@ -200,6 +194,16 @@ public class Event implements Entity
     public void setFriends(List<String> friends)
     {
         this.friends = friends;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     @Override
