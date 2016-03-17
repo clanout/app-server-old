@@ -31,6 +31,7 @@ public class Event implements Entity
     private OffsetDateTime updateTime;
 
     private RSVP rsvp;
+    private String status;
     private int friendCount;
     private int inviterCount;
     private List<String> friends;
@@ -204,6 +205,16 @@ public class Event implements Entity
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(String status)
+    {
+        this.status = status;
     }
 
     @Override

@@ -17,7 +17,8 @@ SELECT
   e.attendee_count,
   f.inviter_count,
   g.friend_count,
-  h.description     AS description
+  h.description     AS description,
+  i.status          AS status
 FROM
   (
     SELECT *
@@ -104,3 +105,10 @@ FROM
     GROUP BY event_id
   ) g
     ON a.event_id = g.event_id
+  INNER JOIN
+  (
+    SELECT *
+    FROM event_attendees
+    WHERE attendee_id = ? AND event_id = ?
+  ) i
+    ON a.event_id = i.event_id

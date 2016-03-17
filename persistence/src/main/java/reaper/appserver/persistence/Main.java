@@ -29,7 +29,7 @@ public class Main
         UserRepository userRepository = RepositoryFactory.create(User.class);
         EventRepository eventRepository = RepositoryFactory.create(Event.class);
 
-        User aditya = userRepository.getFromUsername("aytida77@gmail.com");
+        User aditya = userRepository.getFromUsername("gaurav5534@gmail.com");
         System.out.println(gson.toJson(eventRepository.getVisibleEvents(aditya, "Bengaluru")));
 
         postgreDatabaseAdapter.close();

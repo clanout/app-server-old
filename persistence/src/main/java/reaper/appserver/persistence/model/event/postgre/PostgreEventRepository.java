@@ -81,6 +81,8 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setLong(10, userId);
             preparedStatement.setLong(11, userId);
             preparedStatement.setObject(12, eventId);
+            preparedStatement.setLong(13, userId);
+            preparedStatement.setObject(14, eventId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
@@ -433,6 +435,7 @@ public class PostgreEventRepository extends AbstractPostgreRepository<Event> imp
             preparedStatement.setLong(8, userId);
             preparedStatement.setLong(9, userId);
             preparedStatement.setLong(10, userId);
+            preparedStatement.setLong(11, userId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())

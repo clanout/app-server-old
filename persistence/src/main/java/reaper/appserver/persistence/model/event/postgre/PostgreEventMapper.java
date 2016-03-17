@@ -100,7 +100,19 @@ public class PostgreEventMapper implements PostgreEntityMapper<Event>
             throw new SQLException("Unable to process create_time (timestamp)");
         }
 
-        event.setDescription(resultSet.getString("description"));
+        String description = resultSet.getString("description");
+        if (description == null)
+        {
+            description = "";
+        }
+        event.setDescription(description);
+
+        String status = resultSet.getString("status");
+        if (status == null)
+        {
+            status = "";
+        }
+        event.setStatus(status);
 
         return event;
     }
