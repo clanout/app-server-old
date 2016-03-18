@@ -130,7 +130,7 @@ FROM
     GROUP BY event_id
   ) g
     ON visible.event_id = g.event_id
-  INNER JOIN
+  LEFT JOIN
   (
     SELECT *
     FROM event_attendees
